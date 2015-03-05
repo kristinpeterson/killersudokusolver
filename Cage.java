@@ -12,7 +12,7 @@ public class Cage{
 
 	public Cage(String[] info){
 		cells = new ArrayList();
-		for (int i; i<info.length; i++) {
+		for (int i=0; i<info.length; i++) {
 			if(i == info.length -1 ){
 				goal = Integer.parseInt(info[i]);
 			} else {
@@ -20,6 +20,19 @@ public class Cage{
 				i++; //increment extra to account for y
 			}
 		}
+	}
+
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		for (int i=0; i<cells.size(); i++) {
+			Cell t = (Cell)cells.get(i);
+			sb.append(t.getX());
+			sb.append(",");
+			sb.append(t.getY());
+			sb.append(",");
+		}
+		sb.append(goal);
+		return sb.toString();
 	}
 
 }
