@@ -39,4 +39,8 @@ public class Cell{
 		value = num;
 	}
 
+	public int getValue(){
+		return value;
+	}
+
 }
