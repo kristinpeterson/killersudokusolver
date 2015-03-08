@@ -25,7 +25,7 @@ public class KillerSudoku{
 
 	private ArrayList<Cage> cages;
 
-	private static final int[] POSSIBLE_VALUES = {0,1,2,3,4,5,6,7,8,9};
+	private static final int[] POSSIBLE_VALUES = {1,2,3,4,5,6,7,8,9};
 
 	public KillerSudoku(){
 		cages = new ArrayList<Cage>();
@@ -65,6 +65,10 @@ public class KillerSudoku{
 		}
 
 		ArcConsistency.enforce(ks);
+		for(Cage aCage : ks.cages) {
+			System.out.println(aCage.toString());
+			output.write(aCage.toString());
+		}
 
         output.close();
 

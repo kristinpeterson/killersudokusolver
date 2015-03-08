@@ -22,6 +22,7 @@ public class ArcConsistency{
 			ArrayList<Cell> cells = cage.getCells();
 			for (Cell t : cells) {
 				if (t.getSolutions().size() == 1) {
+					t.setValue(t.getSolutions().get(0)); // Set the cell value property
 					// Cell value can't repeat in row, column or box
 					ne.add("row_" + t.getY() + "_val_" + t.getValue());
 					ne.add("col_" + t.getX() + "_val_" + t.getValue());

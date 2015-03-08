@@ -51,6 +51,10 @@ public class Cell{
 		value = num;
 	}
 
+	public void setValue(Integer num){
+		value = num.intValue();
+	}
+
 	public int getValue(){
 		return value;
 	}
