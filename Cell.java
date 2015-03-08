@@ -3,20 +3,25 @@ CECS-551 AI
 Killer Sudoku Solver
 */
 
+import java.util.ArrayList;
+
 public class Cell{
 
 	private int x;
 	private int y;
 	private int value;
+	private ArrayList<Integer> possibleSolutions;
 
 	public Cell(int x, int y){
 		this.x = x;
 		this.y = y;
+		possibleSolutions = new ArrayList<Integer>();
 	}
 
 	public Cell(String xs, String ys){
 		x = Integer.parseInt(xs);
 		y = Integer.parseInt(ys);
+		possibleSolutions = new ArrayList<Integer>();
 	}
 
 	public void setX(int x){
@@ -41,6 +46,29 @@ public class Cell{
 
 	public int getValue(){
 		return value;
+	}
+
+	public void addSolution(Integer i){
+		if(!possibleSolutions.contains(i))
+			possibleSolutions.add(i);
+	}
+
+	public boolean removeSolution(Integer i){
+
+		return possibleSolutions.remove(i);
+	}
+
+	public ArrayList<Integer> getSolutions(){
+		return (ArrayList<Integer>)possibleSolutions.clone();
+	}
+
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("x: "+x);
+		sb.append(" y: "+y);
+		sb.append(" solutions: "+ getSolutions());
+		
+		return sb.toString();
 	}
 
 }
