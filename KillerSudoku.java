@@ -60,6 +60,8 @@ public class KillerSudoku{
 			output.write(temp.toString());
 		}
 
+		ArcConsistency.enforce(ks);
+
         output.close();
 
 		/*
@@ -73,6 +75,43 @@ public class KillerSudoku{
 
 	private void addCage(Cage c){
 		cages.add(c);
+	}
+
+	public ArrayList<Cage> getCages(){
+		return cages;
+	}
+
+	public int getBox(Cell c){
+		/* Return which bolded box number this cell would be in
+		1 2 3
+		4 5 6
+		7 8 9
+		*/
+		if (c.getX() < 4){
+			if (c.getY() < 4) {
+				return 1;
+			} else if (c.getY() < 7){
+				return 2;
+			}
+			return 3;
+
+		} else if (c.getX() < 7){
+			if (c.getY() < 4) {
+				return 4;
+			} else if (c.getY() < 7){
+				return 5;
+			}
+			return 6;
+
+		} else {
+			if (c.getY() < 4) {
+				return 7;
+			} else if (c.getY() < 7){
+				return 8;
+			}
+			return 9;
+		}
+
 	}
 
 	private List<Stack<Integer>> sumCombinations(Stack<Integer> stack, int sum, int fromIndex, int endIndex,

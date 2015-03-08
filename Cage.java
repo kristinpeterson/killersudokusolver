@@ -30,7 +30,7 @@ public class Cage{
 		return goal;
 	}
 
-	public ArrayList getCells() {
+	public ArrayList<Cell> getCells() {
 		return cells;
 	}
 

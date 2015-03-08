@@ -48,6 +48,10 @@ public class Cell{
 		return value;
 	}
 
+	public boolean isSolution(Integer i){
+		return possibleSolutions.contains(i);
+	}
+
 	public void addSolution(Integer i){
 		if(!possibleSolutions.contains(i))
 			possibleSolutions.add(i);
