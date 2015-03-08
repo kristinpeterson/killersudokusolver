@@ -61,13 +61,22 @@ public class KillerSudoku{
 		}
 
         output.close();
+
+		/*
+		// Printing possible solutions for Cages
+		for(int i = 0; i < ks.cages.size(); i++) {
+			System.out.print("Cage size: " + ks.cages.get(i).getCells().size() +
+					"\t| Cage Goal: " + ks.cages.get(i).getGoal() + "\t|\t");
+			System.out.println(sumCombinationsPerCage.get(i).toString());
+		} */
 	}
 
 	private void addCage(Cage c){
 		cages.add(c);
 	}
 
-	private List<Stack<Integer>> sumCombinations(Stack<Integer> stack, int sum, int fromIndex, int endIndex, int target, int size, List<Stack<Integer>> possibleSolutions) {
+	private List<Stack<Integer>> sumCombinations(Stack<Integer> stack, int sum, int fromIndex, int endIndex,
+												 int target, int size, List<Stack<Integer>> possibleSolutions) {
 
 		if (sum == target && stack.size() == size) {
 			// possible solution found!
