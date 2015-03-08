@@ -1,8 +1,16 @@
-/*
-CECS-551 AI 
-Kristin Peterson and Ariel Katz
-Killer Sudoku Solver
-*/
+/**
+ * COURSE: CECS-551 AI
+ * PROFESSOR: Todd Ebert
+ * PROJECT: Killer Sudoku Solver
+ *
+ * KillerSudoku is the main class for this Killer Sudoku solver.
+ *
+ * Killer Sudoku is a puzzle that combines elements of Sudoku and Kakuro.
+ *
+ * @author Kristin Peterson
+ * @author Ariel Katz
+ *
+ */
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -17,8 +25,7 @@ public class KillerSudoku{
 
 	private ArrayList<Cage> cages;
 
-	// These vars are used for finding possible sum combinations for all Cages
-	private static int[] possibleValues = {0,1,2,3,4,5,6,7,8,9};
+	private static final int[] POSSIBLE_VALUES = {0,1,2,3,4,5,6,7,8,9};
 
 	public KillerSudoku(){
 		cages = new ArrayList<Cage>();
@@ -34,7 +41,6 @@ public class KillerSudoku{
     	BufferedReader br = new BufferedReader(fr);
 
     	String eachLine = br.readLine();
-    	String [] grid;
 
     	while (eachLine != null) {
     		ks.addCage(new Cage(eachLine.split(",")));
@@ -47,30 +53,21 @@ public class KillerSudoku{
 		BufferedWriter output = new BufferedWriter(new FileWriter(of));
 
 		/** Find all combinations that add up to each Cage goal */
-		ArrayList<List<Stack<Integer>>> sumCombinationsPerCage = new ArrayList<List<Stack<Integer>>>();
-		for(int i = 0; i < ks.cages.size(); i++) {
-			Cage temp = ks.cages.get(i);
-			int goal = temp.getGoal();
-			int size = temp.getCells().size();
+		for(Cage aCage : ks.cages) {
+			int goal = aCage.getGoal();
+			int size = aCage.getCells().size();
 			List<Stack<Integer>> possibleSolutions = new ArrayList<Stack<Integer>>();
 			int sum = 0;
 			Stack<Integer> stack = new Stack<Integer>();
-			temp.setSolutions(ks.sumCombinations(stack, sum, 0, possibleValues.length, goal, size, possibleSolutions));
-			System.out.println(temp.toString());
-			output.write(temp.toString());
+			aCage.setSolutions(ks.sumCombinations(stack, sum, 0, goal, size, possibleSolutions));
+			System.out.println(aCage.toString());
+			output.write(aCage.toString());
 		}
 
 		ArcConsistency.enforce(ks);
 
         output.close();
 
-		/*
-		// Printing possible solutions for Cages
-		for(int i = 0; i < ks.cages.size(); i++) {
-			System.out.print("Cage size: " + ks.cages.get(i).getCells().size() +
-					"\t| Cage Goal: " + ks.cages.get(i).getGoal() + "\t|\t");
-			System.out.println(sumCombinationsPerCage.get(i).toString());
-		} */
 	}
 
 	private void addCage(Cage c){
@@ -81,61 +78,43 @@ public class KillerSudoku{
 		return cages;
 	}
 
-	public int getBox(Cell c){
-		/* Return which bolded box number this cell would be in
-		1 2 3
-		4 5 6
-		7 8 9
-		*/
-		if (c.getX() < 4){
-			if (c.getY() < 4) {
-				return 1;
-			} else if (c.getY() < 7){
-				return 2;
-			}
-			return 3;
+	/**
+	 * Find all possible combinations of integers that add to the
+	 * Cage goal, number of integers limited to Cage size.
+	 *
+	 * @param stack list of possible solutions for a cage
+	 * @param sum the sum of integers in the stack
+	 * @param fromIndex index to start with when searching possible values (search from left to right)
+	 * @param goal the Cage sum goal
+	 * @param size the size of the cage, number of elements each solution stack should have
+	 * @param possibleSolutions list of possible solution stacks
+	 * @return the possible solutions for the Cage
+	 */
+	private List<Stack<Integer>> sumCombinations(Stack<Integer> stack, int sum, int fromIndex,
+												 int goal, int size, List<Stack<Integer>> possibleSolutions) {
 
-		} else if (c.getX() < 7){
-			if (c.getY() < 4) {
-				return 4;
-			} else if (c.getY() < 7){
-				return 5;
-			}
-			return 6;
-
-		} else {
-			if (c.getY() < 4) {
-				return 7;
-			} else if (c.getY() < 7){
-				return 8;
-			}
-			return 9;
-		}
-
-	}
-
-	private List<Stack<Integer>> sumCombinations(Stack<Integer> stack, int sum, int fromIndex, int endIndex,
-												 int target, int size, List<Stack<Integer>> possibleSolutions) {
-
-		if (sum == target && stack.size() == size) {
+		if (sum == goal && stack.size() == size) {
 			// possible solution found!
 			Stack<Integer> possibleSolution = new Stack<Integer>();
-			// Make copy of stack, reason:
-			// cannot directly add stack to possibleSolutions list
-			// because any changes to stack will propagate to possibleSolutions
-			// list, rendering it useless.
-			for(int i = 0; i < stack.size(); i++) {
-				possibleSolution.add(stack.get(i));
+
+			/* Make copy of solution stack, reason:
+			 * cannot directly add stack to possibleSolutions list
+			 * because any changes to stack will propagate to possibleSolutions
+			 * list, rendering it useless.
+			 */
+			for (Integer i : stack) {
+				possibleSolution.add(i);
 			}
+
 			possibleSolutions.add(possibleSolution);
 			return possibleSolutions;
 		}
 
-		for (int currentIndex = fromIndex; currentIndex < endIndex; currentIndex++) {
-			if (sum + possibleValues[currentIndex] <= target) {
-				stack.push(possibleValues[currentIndex]);
-				sum += possibleValues[currentIndex];
-				sumCombinations(stack, sum, currentIndex + 1, endIndex, target, size, possibleSolutions);
+		for (int currentIndex = fromIndex; currentIndex < POSSIBLE_VALUES.length; currentIndex++) {
+			if (sum + POSSIBLE_VALUES[currentIndex] <= goal) {
+				stack.push(POSSIBLE_VALUES[currentIndex]);
+				sum += POSSIBLE_VALUES[currentIndex];
+				sumCombinations(stack, sum, currentIndex + 1, goal, size, possibleSolutions);
 				sum -= stack.pop();
 			}
 		}

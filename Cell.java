@@ -1,7 +1,14 @@
-/*
-CECS-551 AI 
-Killer Sudoku Solver
-*/
+/**
+ * COURSE: CECS-551 AI
+ * PROFESSOR: Todd Ebert
+ * PROJECT: Killer Sudoku Solver
+ *
+ * The Cell class represents each cell in the Killer Sudoku puzzle.
+ *
+ * @author Kristin Peterson
+ * @author Ariel Katz
+ *
+ */
 
 import java.util.ArrayList;
 
@@ -58,7 +65,6 @@ public class Cell{
 	}
 
 	public boolean removeSolution(Integer i){
-
 		return possibleSolutions.remove(i);
 	}
 
@@ -66,13 +72,43 @@ public class Cell{
 		return (ArrayList<Integer>)possibleSolutions.clone();
 	}
 
+	/** Return which nonet this cell would be in
+	 *  1 2 3
+	 *  4 5 6
+	 *  7 8 9
+	 *
+	 *  Nonet: A 3×3 grid of cells, as outlined by the bolder lines in the puzzle
+	*/
+	public int getNonet(){
+		if (this.getX() < 4){
+			if (this.getY() < 4) {
+				return 1;
+			} else if (this.getY() < 7){
+				return 2;
+			}
+			return 3;
+
+		} else if (this.getX() < 7){
+			if (this.getY() < 4) {
+				return 4;
+			} else if (this.getY() < 7){
+				return 5;
+			}
+			return 6;
+
+		} else {
+			if (this.getY() < 4) {
+				return 7;
+			} else if (this.getY() < 7){
+				return 8;
+			}
+			return 9;
+		}
+
+	}
+
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("x: "+x);
-		sb.append(" y: "+y);
-		sb.append(" solutions: "+ getSolutions());
-		
-		return sb.toString();
+		return "x: " + x + " y: " + y + " solutions: " + getSolutions() + "\n";
 	}
 
 }

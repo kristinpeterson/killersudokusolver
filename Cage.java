@@ -1,7 +1,17 @@
-/*
-CECS-551 AI 
-Killer Sudoku Solver
-*/
+/**
+ * COURSE: CECS-551 AI
+ * PROFESSOR: Todd Ebert
+ * PROJECT: Killer Sudoku Solver
+ *
+ * A Cage is the grouping of cells in a Killer Sudoku puzzle denoted by a dotted
+ * line or by individual colours.
+ *
+ * Cages contain 2 to 9 cells and a value that the cells in the cage should sum to.
+ *
+ * @author Kristin Peterson
+ * @author Ariel Katz
+ *
+ */
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +21,7 @@ public class Cage{
 
 	private int goal;
 	private ArrayList<Cell> cells;
-	public String cage_id;
+	public String cageId;
 
 	public Cage(String[] info){
 		cells = new ArrayList<Cell>();
@@ -23,7 +33,7 @@ public class Cage{
 				i++; //increment extra to account for y
 			}
 		}
-		cage_id = getCageId();
+		cageId = getCageId();
 	}
 
 	public int getGoal()  {
@@ -34,39 +44,41 @@ public class Cage{
 		return cells;
 	}
 
+	/**
+	 * Sets the possible solutions for this Cage
+	 *
+	 * @param ps possible solutions for this Cage
+	 */
 	public void setSolutions(List<Stack<Integer>> ps){
-		for(int i=0; i< ps.size(); i++){
-			Stack<Integer> myStack = ps.get(i);
-			while(!myStack.empty()){
-				Integer k = myStack.pop();
-				for (int j=0; j<cells.size(); j++) {
-					cells.get(j).addSolution(k);
+		for (Stack<Integer> stack : ps) {
+			while (!stack.empty()) {
+				Integer k = stack.pop();
+				for (Cell cell : cells) {
+					cell.addSolution(k);
 				}
 			}
 		}
 	}
 
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(cage_id + "\n");
-		for (int i=0; i < cells.size(); i++) {
-			Cell t = (Cell)cells.get(i);
-			sb.append(t.toString());
+		StringBuilder sb = new StringBuilder();
+		sb.append(cageId).append("\n");
+		for (Cell cell : cells) {
+			sb.append(cell.toString());
 		}
-		sb.append(" Goal: " + goal + "\n");
+		sb.append(" Goal: ").append(goal).append("\n");
 		return sb.toString();
 	}
 
 	public String getCageId() {
-		StringBuffer sb = new StringBuffer();
-		for (int i=0; i < cells.size(); i++) {
-			Cell t = (Cell)cells.get(i);
+		StringBuilder sb = new StringBuilder();
+		for (Cell t : cells) {
 			sb.append(t.getX());
 			sb.append("_");
 			sb.append(t.getY());
 			sb.append(",");
 		}
-		sb.append("g" + goal);
+		sb.append("g").append(goal);
 		return sb.toString();
 	}
 
