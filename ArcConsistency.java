@@ -52,9 +52,9 @@ public class ArcConsistency{
 				if (cell.getSolutions().size() == 1) {
 					cell.setValue(cell.getSolutions().get(0)); // Set the cell value property
 					// Cell value can't repeat in row, column or nonet
-					taken.add("cell_" + cell.getX() + "_" +cell.getY() + "_val_" + cell.getValue());
-					taken.add("nonet_" + cell.getNonet() + "_val_" + cell.getValue());
-					taken.add("cage_" + cage.getCageId() + "_val_" + cell.getValue());
+					taken.add("cell_" + cell.getX() + "_" + cell.getY() + "_val_" + cell.getValue());
+					taken.add("nonet_" + cell.getNonet() + "_" + cell.getX() + "_" + cell.getY() + "_val_" + cell.getValue());
+					taken.add("cage_" + cage.getCageId() + "_" + cell.getX() + "_" + cell.getY() + "_val_" + cell.getValue());
 				} 
 			}
 		}
@@ -63,38 +63,45 @@ public class ArcConsistency{
 
 		while(taken.size() > 0){
 			String[] constraint = taken.pop().split("_");
-			System.out.println("0 " + constraint[0]+" 1 " +constraint[1] +" 2 " + constraint[2]+" 3 " +constraint[3] );
-			System.out.println("4 " + constraint[4]+" 5 " +constraint[5] +" 6 " + constraint[6]+" 7 " +constraint[7] );
+			//System.out.println("0 " + constraint[0]+" 1 " +constraint[1] +" 2 " + constraint[2]+" 3 " +constraint[3] );
+			//System.out.println("4 " + constraint[4]+" 5 " +constraint[5] +" 6 " + constraint[6]+" 7 " +constraint[7] );
 
 			for (Cage cage : cages) {
 				ArrayList<Cell> cells = cage.getCells();
 				for (Cell t : cells) {
-					//special row 2 case and cell is in that row
-					int y1 = Integer.parseInt(constraint[1]);
-					int x1 = Integer.parseInt(constraint[2]);
-					int y2 = Integer.parseInt(constraint[3]);
-					int x2 = Integer.parseInt(constraint[4]);
-					if (constraint[0].equals("row2case") && y1 == t.getY() && x1 != t.getX() && x2 != t.getX()) { 
-						System.out.println(t.toString());
-						t.removeSolution(new Integer(constraint[6]));
-						t.removeSolution(new Integer(constraint[7]));
+					//Special 2 case handling
+					if (constraint[0].equals("row2case") || constraint[0].equals("col2case") || constraint[0].equals("non2case")) {
+						int y1 = Integer.parseInt(constraint[1]);
+						int x1 = Integer.parseInt(constraint[2]);
+						int y2 = Integer.parseInt(constraint[3]);
+						int x2 = Integer.parseInt(constraint[4]);
 
-						//special column 2 case and cell is in that column
-					} else if (constraint[0].equals("col2case") && x1 == t.getX() && y1 != t.getY() && y2 != t.getY()){
-						System.out.println(t.toString());
-						t.removeSolution(new Integer(constraint[6]));
-						t.removeSolution(new Integer(constraint[7]));
-
-						//special nonet 2 case and cell is in that nonet
-					} else if (constraint[0].equals("non2case")){
-						int nonet = Integer.parseInt(constraint[5]);
-						if( nonet == t.getNonet() && x1 != t.getX() && x2 != t.getX() && y1 != t.getY() && y2 != t.getY()){
-							System.out.println(t.toString());
+						//special row 2 case and cell is in that row
+						if (constraint[0].equals("row2case") && y1 == t.getY() && x1 != t.getX() && x2 != t.getX()) { 
+							t.removeSolution(new Integer(constraint[6]));
 							t.removeSolution(new Integer(constraint[7]));
-							t.removeSolution(new Integer(constraint[8]));
-						}
-					}
 
+							//special column 2 case and cell is in that column
+						} else if (constraint[0].equals("col2case") && x1 == t.getX() && y1 != t.getY() && y2 != t.getY()){
+							t.removeSolution(new Integer(constraint[6]));
+							t.removeSolution(new Integer(constraint[7]));
+
+							//special nonet 2 case and cell is in that nonet
+						} else if (constraint[0].equals("non2case")){
+							int nonet = Integer.parseInt(constraint[5]);
+							if( nonet == t.getNonet() && x1 != t.getX() && x2 != t.getX() && y1 != t.getY() && y2 != t.getY()){
+								t.removeSolution(new Integer(constraint[7]));
+								t.removeSolution(new Integer(constraint[8]));
+							}
+						}	
+					}
+					if (constraint[0].equals("nonet") && constraint[1].equals(Integer.toString(t.getNonet())) && !constraint[2].equals(Integer.toString(t.getY())) && !constraint[3].equals(Integer.toString(t.getX())) ) {
+						t.removeSolution(new Integer(constraint[5]));
+					}
+					if (constraint[0].equals("cage") && constraint[1].equals(cage.getCageId()) && !constraint[2].equals(Integer.toString(t.getY())) && !constraint[3].equals(Integer.toString(t.getX()))) {
+						t.removeSolution(new Integer(constraint[5])); //remove that value from the cell's domain
+						//now check cage permutated solutions for to see if any can be removed given the new info
+					}
 				}
 			}
 		} 
