@@ -27,6 +27,7 @@ public class ArcConsistency{
 					ne.add("row_" + t.getY() + "_val_" + t.getValue());
 					ne.add("col_" + t.getX() + "_val_" + t.getValue());
 					ne.add("box_" + t.getNonet() + "_val_" + t.getValue());
+					ne.add("cage_" + cage.getCageId() + "_val_" + t.getValue());
 				}
 			}
 		}
@@ -36,7 +37,7 @@ public class ArcConsistency{
 			for (Cage cage : cages) {
 				ArrayList<Cell> cells = cage.getCells();
 				for (Cell t : cells) {
-					if (t.getSolutions().size() != 1) {
+					if (t.getSolutions().size() != 1) { //if there isn't aready solution remove non essential from solution set
 						if (constraint[0].equals("row") && constraint[1].equals(Integer.toString(t.getY()))) {
 							t.removeSolution(new Integer(constraint[3]));
 						}
@@ -46,6 +47,9 @@ public class ArcConsistency{
 						if (constraint[0].equals("box") && constraint[1].equals(Integer.toString(t.getNonet()))) {
 							t.removeSolution(new Integer(constraint[3]));
 						}
+						if (constraint[0].equals("cage") && constraint[1].equals(cage.getCageId())) {
+							t.removeSolution(new Integer(constraint[3]));
+						}
 					}
 				}
 			}
@@ -53,5 +57,6 @@ public class ArcConsistency{
 		}
 
 	}
+
 
 }

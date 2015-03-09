@@ -74,7 +74,7 @@ public class Cage{
 		StringBuilder sb = new StringBuilder();
 		for (Cell t : cells) {
 			sb.append(t.getX());
-			sb.append("_");
+			sb.append(".");
 			sb.append(t.getY());
 			sb.append(",");
 		}
