@@ -56,10 +56,12 @@ public class KillerSudoku{
 		for(Cage aCage : ks.cages) {
 			int goal = aCage.getGoal();
 			int size = aCage.getCells().size();
-			List<Stack<Integer>> possibleSolutions = new ArrayList<Stack<Integer>>();
 			int sum = 0;
 			Stack<Integer> stack = new Stack<Integer>();
-			aCage.setSolutions(ks.sumCombinations(stack, sum, 0, goal, size, possibleSolutions));
+			List<Stack<Integer>> possibleSolutions = new ArrayList<Stack<Integer>>();
+			possibleSolutions = ks.sumCombinations(stack, sum, 0, goal, size, possibleSolutions);
+			aCage.setSolutions(possibleSolutions);
+			System.out.println("\nPermutated Solutions:\n" + aCage.getPermutatedSolutions());
 			System.out.println(aCage.toString());
 			output.write(aCage.toString());
 		}
