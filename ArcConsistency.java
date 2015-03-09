@@ -36,11 +36,15 @@ public class ArcConsistency{
 				System.out.println("Special 2 case");
 				/* There are a small number of cases where there are 2 cells in a cage and only 2 possible values 
 				making those 2 values non-essential for some other cells in the row or column. */
+				Cell cell0 = cells.get(0);
+				Cell cell1 = cells.get(1);
 				if (cage.rowOnly()) {
-					taken.add("row2case_" + cells.get(0).getY() +"_" + cells.get(0).getX() + "_" + cells.get(1).getY() +"_" + cells.get(1).getX() + "_val_" + cells.get(1).getSolutions().get(0) + "_" + cells.get(1).getSolutions().get(1));
+					taken.add("row2case_" + cell0.getY() +"_" + cell0.getX() + "_" + cell1.getY() +"_" + cell1.getX() + "_val_" + cell1.getSolutions().get(0) + "_" + cell1.getSolutions().get(1));
 				} else if (cage.columnOnly()) {
-					taken.add("col2case_" + cells.get(0).getY() +"_" + cells.get(0).getX() + "_" + cells.get(1).getY() +"_" + cells.get(1).getX() + "_val_" + cells.get(1).getSolutions().get(0) + "_" + cells.get(1).getSolutions().get(1));
-
+					taken.add("col2case_" + cell0.getY() +"_" + cell0.getX() + "_" + cell1.getY() +"_" + cell1.getX() + "_val_" + cell1.getSolutions().get(0) + "_" + cell1.getSolutions().get(1));
+				} 
+				if (cell0.getNonet() == cell1.getNonet()) {
+					taken.add("non2case_" + cell0.getY() +"_" + cell0.getX() + "_" + cell1.getY() +"_" + cell1.getX() + "_"+ cell0.getNonet() + "_val_" + cell1.getSolutions().get(0) + "_" + cell1.getSolutions().get(1));
 				}
 			}
 
@@ -80,6 +84,15 @@ public class ArcConsistency{
 						System.out.println(t.toString());
 						t.removeSolution(new Integer(constraint[6]));
 						t.removeSolution(new Integer(constraint[7]));
+
+						//special nonet 2 case and cell is in that nonet
+					} else if (constraint[0].equals("non2case")){
+						int nonet = Integer.parseInt(constraint[5]);
+						if( nonet == t.getNonet() && x1 != t.getX() && x2 != t.getX() && y1 != t.getY() && y2 != t.getY()){
+							System.out.println(t.toString());
+							t.removeSolution(new Integer(constraint[7]));
+							t.removeSolution(new Integer(constraint[8]));
+						}
 					}
 
 				}
