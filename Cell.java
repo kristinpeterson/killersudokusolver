@@ -72,8 +72,12 @@ public class Cell{
 		return possibleSolutions.remove(i);
 	}
 
-	public ArrayList<Integer> getSolutions(){
-		return (ArrayList<Integer>)possibleSolutions.clone();
+	public ArrayList<Integer> getSolutions() {
+		ArrayList<Integer> solutionsClone = new ArrayList<Integer>();
+		for (Integer i : possibleSolutions) {
+			solutionsClone.add(i);
+		}
+		return solutionsClone;
 	}
 
 	/** Return which nonet this cell would be in
