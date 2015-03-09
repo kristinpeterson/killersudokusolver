@@ -116,7 +116,7 @@ public class Cell{
 	}
 
 	public String toString() {
-		return "x: " + x + " y: " + y + " solutions: " + getSolutions() + "\n";
+		return "x: " + x + " y: " + y + " domain: " + getSolutions() + "\n";
 	}
 
 }

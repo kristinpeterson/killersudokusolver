@@ -152,6 +152,8 @@ public class Cage{
 			sb.append(cell.toString());
 		}
 		sb.append(" Goal: ").append(goal).append("\n");
+		sb.append("Possible Solutions:");
+		sb.append(permutatedSolutions);
 		return sb.toString();
 	}
 

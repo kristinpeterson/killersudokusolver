@@ -33,7 +33,7 @@ public class ArcConsistency{
 					ne.add("row_" + cell.getY() + "_val_" + cell.getValue());
 					ne.add("col_" + cell.getX() + "_val_" + cell.getValue());
 					ne.add("nonet_" + cell.getNonet() + "_val_" + cell.getValue());
-					ne.add("cage_" + cage.getCageId() + "_val_" + t.getValue());
+					ne.add("cage_" + cage.getCageId() + "_val_" + cell.getValue());
 				}
 			}
 		}
@@ -54,7 +54,8 @@ public class ArcConsistency{
 							t.removeSolution(new Integer(constraint[3]));
 						}
 						if (constraint[0].equals("cage") && constraint[1].equals(cage.getCageId())) {
-							t.removeSolution(new Integer(constraint[3]));
+							t.removeSolution(new Integer(constraint[3])); //remove that value from the cell's domain
+							//now check cage permutated solutions for to see if any can be removed given the new info
 						}
 					}
 				}
