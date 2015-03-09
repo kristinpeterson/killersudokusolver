@@ -68,7 +68,7 @@ public class KillerSudoku{
 
 		ArcConsistency.enforce(ks);
 		for(Cage aCage : ks.cages) {
-			System.out.println(aCage.toString());
+			//System.out.println(aCage.toString());
 			output.write(aCage.toString());
 		}
 
