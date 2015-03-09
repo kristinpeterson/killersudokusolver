@@ -57,8 +57,32 @@ public class Cage{
 		return goal;
 	}
 
+	public int getSize()  {
+		return cells.size();
+	}
+
 	public ArrayList<Cell> getCells() {
 		return cells;
+	}
+
+	public boolean rowOnly() {
+		int row = cells.get(0).getY();
+		for (int i=1; i<cells.size(); i++) {
+			if (cells.get(i).getY() != row) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public boolean columnOnly() {
+		int col = cells.get(0).getX();
+		for (int i=1; i<cells.size(); i++) {
+			if (cells.get(i).getX() != col) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
