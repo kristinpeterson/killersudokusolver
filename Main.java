@@ -36,6 +36,13 @@ public class Main {
       		eachLine = br.readLine();
     	}
 
+		// Add cells to board
+		for(Cage cage : board.getCages()) {
+			for(Cell cell : cage.getCells()) {
+				board.addCell(cell);
+			}
+		}
+
 		/* Iteration 1 output */
 
 		File of = new File("output.txt");
@@ -55,13 +62,147 @@ public class Main {
 			output.write(aCage.toString());
 		}
 
-		for(Cage aCage : ks.cages) {
+		for(Cage aCage : board.getCages()) {
 			//System.out.println(aCage.toString());
 			output.write(aCage.toString());
 		}
 
+		buildConstraints();
+
         output.close();
 
 	}
+
+	/**
+	 * Builds all constraint sets: row, column, nonet
+	 *
+	 * TODO: add representation of cage constraints as set of Constraint objects
+	 */
+	private static void buildConstraints() {
+
+		ArrayList<Constraint> rowConstraints = new ArrayList<Constraint>();
+		ArrayList<Constraint> colConstraints = new ArrayList<Constraint>();
+		ArrayList<Constraint> nonetConstraints = new ArrayList<Constraint>();
+		ArrayList<Constraint> cageConstraints = new ArrayList<Constraint>();
+
+		// Starting satisfying assignments for constraints
+		ArrayList<ArrayList<Integer>> rcInitSatisfyingAssignments = buildInitialRCSA();
+		ArrayList<ArrayList<Integer>> nonetInitSatisfyingAssignments = buildInitialNonetSA();
+
+		// Build rowConstraints
+		for(int r = 1; r <= Board.SIZE; r++) {
+			for(int c = 1; c <= Board.SIZE; c++) {
+				for(int i = c; i <= Board.SIZE; i++) {
+					if (c != i) {
+						String constraintName = "Cx" + r + c + "x" + r + i;
+						Constraint constraint = new Constraint(constraintName, rcInitSatisfyingAssignments);
+						rowConstraints.add(constraint);
+					}
+				}
+			}
+		}
+
+		// Build colConstraints
+		for(int c = 1; c <= Board.SIZE; c++) {
+			for(int r = 1; r <= Board.SIZE; r++) {
+				for(int i = r; i <= Board.SIZE; i++) {
+					if (r != i) {
+						String constraintName = "Cx" + r + c + "x" + i + c;
+						Constraint constraint = new Constraint(constraintName, rcInitSatisfyingAssignments);
+						colConstraints.add(constraint);
+					}
+				}
+			}
+		}
+
+		// Build nonetConstraints
+		for(int n = 1; n <= Board.NONET_SIZE; n++) {
+			String nonetName = "Cn" + n;
+			nonetConstraints.add(new Constraint(nonetName, nonetInitSatisfyingAssignments));
+		}
+
+		// Temporary output of constraint cardinality before arc consistency has been performed
+		System.out.println("**************************");
+		System.out.println("ROW CONSTRAINTS");
+		System.out.println("**************************");
+		for(Constraint c : rowConstraints) {
+			System.out.println(c.getName() + "\t" + "Cardinality of constraints before AC:\t" + c.getSatisfyingAssignments().size());
+		}
+		System.out.println("**************************");
+		System.out.println("COLUMN CONSTRAINTS");
+		System.out.println("**************************");
+		for(Constraint c : colConstraints) {
+			System.out.println(c.getName() + "\t" + "Cardinality of constraints before AC:\t" + c.getSatisfyingAssignments().size());
+		}
+		System.out.println("**************************");
+		System.out.println("NONET CONSTRAINTS");
+		System.out.println("**************************");
+		for(Constraint c : nonetConstraints) {
+			System.out.println(c.getName() + "\t" + "Cardinality of constraints before AC:\t" + c.getSatisfyingAssignments().size());
+		}
+	}
+
+	/**
+	 * Builds the initial satisfying assignment list for Row and Column constraints
+	 *
+	 * @return a list of all satisfying assignments (before pruning)
+	 */
+	private static ArrayList<ArrayList<Integer>> buildInitialRCSA() {
+		ArrayList<ArrayList<Integer>> assignmentList = new ArrayList<ArrayList<Integer>>();
+		for(int i = 1; i <= Board.SIZE; i++) {
+			for(int j = 1; j <= Board.SIZE; j++) {
+				if(i != j) {
+					ArrayList<Integer> assignment = new ArrayList<Integer>();
+					assignment.add(i);
+					assignment.add(j);
+					assignmentList.add(assignment);
+				}
+			}
+		}
+		return assignmentList;
+	}
+
+	/**
+	 * Builds the initial satisfying assignment list for Nonet constraints
+	 *
+	 * @return a list of all satisfying assignments (before pruning)
+	 */
+	private static ArrayList<ArrayList<Integer>> buildInitialNonetSA() {
+		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
+		permuteNonetSA(Board.POSSIBLE_VALUES, 0, result);
+		return result;
+	}
+
+	/**
+	 * Recursive method to find all unique permutations of nonet satisfying assignments
+	 *
+	 * @return a list of all satisfying assignments (before pruning)
+	 */
+	private static void permuteNonetSA(int[] values, int fromIndex, ArrayList<ArrayList<Integer>> result) {
+		if (fromIndex >= values.length) {
+			ArrayList<Integer> item = convertArrayToList(values);
+			result.add(item);
+		}
+
+		for (int j = fromIndex; j <= values.length - 1; j++) {
+			swap(values, fromIndex, j);
+			permuteNonetSA(values, fromIndex + 1, result);
+			swap(values, fromIndex, j);
+		}
+	}
+	private static ArrayList<Integer> convertArrayToList(int[] num) {
+		ArrayList<Integer> item = new ArrayList<Integer>();
+		for (int h = 0; h < num.length; h++) {
+			item.add(num[h]);
+		}
+		return item;
+	}
+
+	private static void swap(int[] a, int i, int j) {
+		int temp = a[i];
+		a[i] = a[j];
+		a[j] = temp;
+	}
+
 
 }

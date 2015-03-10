@@ -16,12 +16,16 @@ import java.util.Stack;
  */
 public class Board {
 
-    private ArrayList<Cage> cages;
+    public static final int[] POSSIBLE_VALUES = {1,2,3,4,5,6,7,8,9};
+    public static final int SIZE = 9;
+    public static final int NONET_SIZE = 9;
 
-    private static final int[] POSSIBLE_VALUES = {1,2,3,4,5,6,7,8,9};
+    private ArrayList<Cage> cages;
+    private ArrayList<Cell> cells;
 
     public Board(){
         cages = new ArrayList<Cage>();
+        cells = new ArrayList<Cell>();
     }
 
     public void addCage(Cage c){
@@ -30,6 +34,14 @@ public class Board {
 
     public ArrayList<Cage> getCages(){
         return cages;
+    }
+
+    public ArrayList<Cell> getCells(){
+        return cells;
+    }
+
+    public void addCell(Cell cell){
+        cells.add(cell);
     }
 
     /**
@@ -44,7 +56,7 @@ public class Board {
      * @param possibleSolutions list of possible solution stacks
      * @return the possible solutions for the Cage
      */
-    private List<Stack<Integer>> sumCombinations(Stack<Integer> stack, int sum, int fromIndex,
+    public List<Stack<Integer>> sumCombinations(Stack<Integer> stack, int sum, int fromIndex,
                                                  int goal, int size, List<Stack<Integer>> possibleSolutions) {
 
         if (sum == goal && stack.size() == size) {

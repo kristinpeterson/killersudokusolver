@@ -18,6 +18,11 @@ public class Constraint {
     private Cell[] variables;
     private ArrayList<ArrayList<Integer>> satisfyingAssignments;
 
+    public Constraint(String name, ArrayList<ArrayList<Integer>> satisfyingAssignments) {
+        setName(name);
+        setSatisfyingAssignments(satisfyingAssignments);
+    }
+
     public void setName(String name) {
         this.name = name;
     }
