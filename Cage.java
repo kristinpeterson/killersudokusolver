@@ -1,3 +1,8 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Stack;
+
 /**
  * COURSE: CECS-551 AI
  * PROFESSOR: Todd Ebert
@@ -12,12 +17,6 @@
  * @author Ariel Katz
  *
  */
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Stack;
-
 public class Cage{
 
 	private int goal;
