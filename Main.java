@@ -93,7 +93,8 @@ public class Main {
 				for(int i = c; i <= Board.SIZE; i++) {
 					if (c != i) {
 						String constraintName = "Cx" + r + c + "x" + r + i;
-						Constraint constraint = new Constraint(constraintName, rcInitSatisfyingAssignments);
+						Cell[] variables = {board.getCell(r,c), board.getCell(r,i)};
+						Constraint constraint = new Constraint(constraintName, variables, rcInitSatisfyingAssignments);
 						rowConstraints.add(constraint);
 					}
 				}
@@ -106,7 +107,8 @@ public class Main {
 				for(int i = r; i <= Board.SIZE; i++) {
 					if (r != i) {
 						String constraintName = "Cx" + r + c + "x" + i + c;
-						Constraint constraint = new Constraint(constraintName, rcInitSatisfyingAssignments);
+						Cell[] variables = {board.getCell(r,c), board.getCell(r,i)};
+						Constraint constraint = new Constraint(constraintName, variables, rcInitSatisfyingAssignments);
 						colConstraints.add(constraint);
 					}
 				}
@@ -116,12 +118,13 @@ public class Main {
 		// Build nonetConstraints
 		for(int n = 1; n <= Board.NONET_SIZE; n++) {
 			String nonetName = "Cn" + n;
-			nonetConstraints.add(new Constraint(nonetName, nonetInitSatisfyingAssignments));
+			nonetConstraints.add(new Constraint(nonetName, board.getNonetCells(n), nonetInitSatisfyingAssignments));
 		}
 
 		// Build cageConstraints
 		for(Cage cage : board.getCages()) {
-			cageConstraints.add(new Constraint(cage.getCageId(), cage.getPermutatedSolutions()));
+			Cell[] variables = cage.getCellsAsArray();
+			cageConstraints.add(new Constraint(cage.getCageId(), variables, cage.getPermutatedSolutions()));
 		}
 
 		// Temporary output of constraint cardinality before arc consistency has been performed

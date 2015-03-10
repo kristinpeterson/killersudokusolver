@@ -45,6 +45,45 @@ public class Board {
     }
 
     /**
+     * Gets a Cell in the Board with the given row/column
+     *
+     * @param r the row of the cell to get
+     * @param c the column of the cell to get
+     * @return the Cell at the given row/column, returns null if not found
+     */
+    public Cell getCell(int r, int c) {
+        for(Cell cell : cells) {
+            if(cell.getX() == r && cell.getY() == c) {
+                return cell;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns an array of Cells for the given nonet number
+     * 	1 2 3
+     *  4 5 6
+     *  7 8 9
+     *
+     * @return
+     */
+    public Cell[] getNonetCells(int nonetNumber) {
+        Cell[] cells = new Cell[9];
+        int i = 0;
+        for(Cell cell : this.cells) {
+            if(cell.getNonet() == nonetNumber) {
+                if(i == 9) {
+                    System.out.println(nonetNumber);
+                }
+                cells[i] = cell;
+                i++;
+            }
+        }
+        return cells;
+    }
+
+    /**
      * Find all possible combinations of integers that add to the
      * Cage goal, number of integers limited to Cage size.
      *

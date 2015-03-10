@@ -64,6 +64,15 @@ public class Cage{
 		return cells;
 	}
 
+	public Cell[] getCellsAsArray() {
+		int numCells = this.cells.size();
+		Cell[] cells = new Cell[numCells];
+		for(int i = 0; i < numCells; i++) {
+			cells[i] = this.cells.get(i);
+		}
+		return cells;
+	}
+
 	public boolean rowOnly() {
 		int row = cells.get(0).getY();
 		for (int i=1; i<cells.size(); i++) {
