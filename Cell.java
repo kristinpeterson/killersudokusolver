@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * COURSE: CECS-551 AI
  * PROFESSOR: Todd Ebert
@@ -9,9 +11,6 @@
  * @author Ariel Katz
  *
  */
-
-import java.util.ArrayList;
-
 public class Cell{
 
 	private int x;

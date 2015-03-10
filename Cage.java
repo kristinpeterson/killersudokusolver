@@ -1,3 +1,8 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Stack;
+
 /**
  * COURSE: CECS-551 AI
  * PROFESSOR: Todd Ebert
@@ -12,12 +17,6 @@
  * @author Ariel Katz
  *
  */
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Stack;
-
 public class Cage{
 
 	private int goal;
@@ -62,6 +61,15 @@ public class Cage{
 	}
 
 	public ArrayList<Cell> getCells() {
+		return cells;
+	}
+
+	public Cell[] getCellsAsArray() {
+		int numCells = this.cells.size();
+		Cell[] cells = new Cell[numCells];
+		for(int i = 0; i < numCells; i++) {
+			cells[i] = this.cells.get(i);
+		}
 		return cells;
 	}
 
@@ -110,14 +118,14 @@ public class Cage{
 	 *
 	 * @return permutated list of all possible solutions for this Cage
 	 */
-	public List<Stack<Integer>> getPermutatedSolutions(){
-		List<Stack<Integer>> solutionsClone = new ArrayList<Stack<Integer>>();
+	public ArrayList<ArrayList<Integer>> getPermutatedSolutions(){
+		ArrayList<ArrayList<Integer>> solutionsClone = new ArrayList<ArrayList<Integer>>();
 		for (Stack<Integer> s : permutatedSolutions) {
-			Stack<Integer> tempStack = new Stack<Integer>();
+			ArrayList<Integer> solution = new ArrayList<Integer>();
 			for (Integer i : s) {
-				tempStack.add(i);
+				solution.add(i);
 			}
-			solutionsClone.add(tempStack);
+			solutionsClone.add(solution);
 		}
 		return solutionsClone;
 	}
