@@ -109,14 +109,14 @@ public class Cage{
 	 *
 	 * @return permutated list of all possible solutions for this Cage
 	 */
-	public List<Stack<Integer>> getPermutatedSolutions(){
-		List<Stack<Integer>> solutionsClone = new ArrayList<Stack<Integer>>();
+	public ArrayList<ArrayList<Integer>> getPermutatedSolutions(){
+		ArrayList<ArrayList<Integer>> solutionsClone = new ArrayList<ArrayList<Integer>>();
 		for (Stack<Integer> s : permutatedSolutions) {
-			Stack<Integer> tempStack = new Stack<Integer>();
+			ArrayList<Integer> solution = new ArrayList<Integer>();
 			for (Integer i : s) {
-				tempStack.add(i);
+				solution.add(i);
 			}
-			solutionsClone.add(tempStack);
+			solutionsClone.add(solution);
 		}
 		return solutionsClone;
 	}
