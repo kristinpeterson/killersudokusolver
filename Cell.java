@@ -54,6 +54,10 @@ public class Cell{
 		value = num.intValue();
 	}
 
+	public boolean equals(Cell c){
+		return this.x == c.getX() && this.y == c.getY();
+	}
+
 	public int getValue(){
 		return value;
 	}

@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.Hashtable;
 
 /**
  * COURSE: CECS-551 AI
@@ -24,7 +25,7 @@ public class Main {
 	static ArrayList<Constraint> colConstraints = new ArrayList<Constraint>();
 	static ArrayList<Constraint> nonetConstraints = new ArrayList<Constraint>();
 	static ArrayList<Constraint> cageConstraints = new ArrayList<Constraint>();
-	static ArrayList<String> nonessential = new ArrayList<String>();
+	static Hashtable<String, ArrayList<Integer>> nonessential = new Hashtable<String, ArrayList<Integer>>();
 
 	static Board board = new Board();
 
@@ -77,12 +78,8 @@ public class Main {
 
 		reduceFromNE();
 
-		System.out.println("**************************");
-		System.out.println(nonessential);
-		System.out.println("**************************");
-
 		for(Constraint c : rowConstraints) {
-			//System.out.println(c.getName() + "\n\t\t" + "Cardinality of constraint before AC:\t" + c.getSatisfyingAssignments().size());
+			System.out.println(c.getName() + "\n\t\t" + "Cardinality of constraint after AC:\t" + c.getSatisfyingAssignments().size());
 		}
 
         output.close();
@@ -177,9 +174,72 @@ public class Main {
 				if (ps.size() < 9) {
 					for (int n = 1; n < 10; n++) {
 						if (!ps.contains(new Integer(n))) {
-							addNonEssential("cell_" + cell.getY() + "_" + cell.getX() + "_" + n);
+							addNonEssential("cell_" + cell.getY() + "_" + cell.getX(), n);
 						}
 					}
+				}
+			}
+		}
+	}
+
+	private static void buildNEfromRow() {
+		boolean one=false,two=false,three=false,four=false,five=false,six=false,seven=false,eight=false,nine =false;
+		boolean[] check = new boolean[9];
+		for (boolean a: check ) {
+			a = false;
+		}
+		for (Constraint c : rowConstraints) {
+			ArrayList<ArrayList<Integer>> cSat = c.getSatisfyingAssignments();
+			Cell[] cells = c.getVariables();
+			for (int i=0; i<cells.length; i++) {
+				for(ArrayList<Integer> foo: cSat){
+					switch(foo.get(i)){
+						case 1: one=true;
+						case 2: two=true;
+						case 3: three=true;
+						case 4: four=true;
+						case 5: five=true;
+						case 6: six=true;
+						case 7: seven=true;
+						case 8: eight=true;
+						case 9: nine=true;
+					}
+				}
+				if(one){
+					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 1);
+					one=false;
+				}
+				if(two){
+					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 2);
+					two=false;
+				}
+				if(three){
+					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 3);
+					one=false;
+				}
+				if(four){
+					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 4);
+					four=false;
+				}
+				if(five){
+					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 5);
+					five=false;
+				}
+				if(six){
+					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 6);
+					six=false;
+				}
+				if(seven){
+					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 7);
+					seven=false;
+				}
+				if(eight){
+					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 8);
+					eight=false;
+				}
+				if(nine){
+					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 9);
+					nine=false;
 				}
 			}
 		}
@@ -191,26 +251,41 @@ public class Main {
 	 *
 	 */
 	private static void reduceFromNE() {
-		for(String s: nonessential) {
+		ArrayList<Constraint> allConstraints = rowConstraints;
+		allConstraints.addAll(colConstraints);
+		allConstraints.addAll(nonetConstraints);
+
+		for(String s: nonessential.keySet()) {
 			// info[1] is y
 			// info[2] is x
-			// info[3] is ne value
 			String[] info = s.split("_");
-			for (Constraint c : rowConstraints) {
+			for (Constraint c : allConstraints) {
 				Cell[] cells = c.getVariables();
 				for(int j = 0; j < cells.length; j++) {
+					//if you've found the right cell
 					if (cells[j].getY() == Integer.parseInt(info[1]) && cells[j].getX() == Integer.parseInt(info[2])){
-						c.removeAssignment(j, Integer.parseInt(info[3]));
-						//cells[j].removeSolution(new Integer(info[3]));
+						//pull the arraylist of nonessential values from the hash table
+						ArrayList<Integer> temp = nonessential.get(s); 
+						//loop through the array list and remove each nonessential from the constraint and cell
+						for(Integer assignment: temp){
+							c.removeAssignment(j, assignment);
+							cells[j].removeSolution(assignment);
+						}
 					}
 				}
 			}
+			nonessential.put(s, new ArrayList<Integer>());
 		}
 	}
 
-    public static void addNonEssential(String ne){
-        if(!nonessential.contains(ne))
-			nonessential.add(ne);
+    public static void addNonEssential(String ne, int val){
+    	ArrayList<Integer> temp = new ArrayList<Integer>();
+    	if(nonessential.containsKey(ne)){
+    		temp = nonessential.get(ne);
+    	}
+    	temp.add(new Integer(val));
+    	nonessential.put(ne, temp);
+        
     }
 
 	/**
