@@ -41,7 +41,11 @@ public class Constraint {
     }
 
     public void setSatisfyingAssignments(ArrayList<ArrayList<Integer>> satisfyingAssignments) {
-        this.satisfyingAssignments = satisfyingAssignments;
+        ArrayList<ArrayList<Integer>> satisfyingAssignmentsClone = new ArrayList<ArrayList<Integer>>();
+        for(ArrayList<Integer> assignment : satisfyingAssignments) {
+            satisfyingAssignmentsClone.add(assignment);
+        }
+        this.satisfyingAssignments = satisfyingAssignmentsClone;
     }
 
     public ArrayList<ArrayList<Integer>> getSatisfyingAssignments() {
@@ -49,14 +53,12 @@ public class Constraint {
     }
 
     public void removeAssignment(int cell, int val){
-                for(int j=satisfyingAssignments.size()-1; j>=0; j--) {
-                    //System.out.println("cell j "+cell + j);
-                    if(satisfyingAssignments.get(j).get(cell).equals(new Integer(val))) {
-                        System.out.println("cell j "+cell + j);
-                        System.out.println("satisfyingAssignment.get(i "+ satisfyingAssignments.get(j) + " val "+ val);
-                        //satisfyingAssignments.remove(satisfyingAssignments.get(j));
-                    }
-                } 
+        //start for loop from the end as the remove function shifts the rest of the array down
+        for(int j = satisfyingAssignments.size() - 1; j >= 0 ; j--) {
+            if(satisfyingAssignments.get(j).get(cell).equals(new Integer(val))) {
+                satisfyingAssignments.remove(j);
+            }
+        }
     }
 
     public String toString(){

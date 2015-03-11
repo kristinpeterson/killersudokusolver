@@ -74,10 +74,13 @@ public class Main {
 
 		buildConstraints();
 		buildNEfromCageConstraint();
+
 		reduceFromNE();
-				System.out.println("**************************");
+
+		System.out.println("**************************");
 		System.out.println(nonessential);
 		System.out.println("**************************");
+
 		for(Constraint c : rowConstraints) {
 			//System.out.println(c.getName() + "\n\t\t" + "Cardinality of constraint before AC:\t" + c.getSatisfyingAssignments().size());
 		}
@@ -166,63 +169,44 @@ public class Main {
 	/**
 	 * Builds the nonessential list
 	 *
-	 * @return a list of all satisfying assignments (before pruning)
 	 */
 	private static void buildNEfromCageConstraint() {
-		for(int i = 0; i < cageConstraints.size(); i++) {
-			Constraint c = cageConstraints.get(i);
-			for(int k = 0; k < c.getVariables().length; k++) {
-				Cell[] cells = c.getVariables();
-				for(int j = 0; j < cells.length; j++) {
-					ArrayList<Integer> ps = cells[j].getSolutions();
-					if (ps.size() < 9) {
-						for(int n=1; n<10; n++){
-							if (!ps.contains(new Integer(n))) {
-								addNonEssential("cell_"+cells[j].getY() +"_"+ cells[j].getX() +"_"+ n);
-							}
+		for (Constraint c : cageConstraints) {
+			for (Cell cell : c.getVariables()) {
+				ArrayList<Integer> ps = cell.getSolutions();
+				if (ps.size() < 9) {
+					for (int n = 1; n < 10; n++) {
+						if (!ps.contains(new Integer(n))) {
+							addNonEssential("cell_" + cell.getY() + "_" + cell.getX() + "_" + n);
 						}
 					}
 				}
-				
 			}
 		}
 	}
 
 	/**
-	 * goes through the nonessential list
+	 * Goes through the nonessential list and removes non-essential assignments
+	 * from rowConstraints
 	 *
-	 * @return a list of all satisfying assignments (before pruning)
 	 */
 	private static void reduceFromNE() {
 		for(String s: nonessential) {
+			// info[1] is y
+			// info[2] is x
+			// info[3] is ne value
 			String[] info = s.split("_");
 			for (Constraint c : rowConstraints) {
 				Cell[] cells = c.getVariables();
-				
 				for(int j = 0; j < cells.length; j++) {
 					if (cells[j].getY() == Integer.parseInt(info[1]) && cells[j].getX() == Integer.parseInt(info[2])){
-						//System.out.println("Constraint Name: "+c.getName());
-						//System.out.println("nonessential string: "+s);
-						removeAssignment(c, j, Integer.parseInt(info[3]));
-						cells[j].removeSolution(new Integer(info[3]));
+						c.removeAssignment(j, Integer.parseInt(info[3]));
+						//cells[j].removeSolution(new Integer(info[3]));
 					}
 				}
 			}
 		}
 	}
-
-	public static void removeAssignment(Constraint c, int cell, int val){
-		ArrayList<ArrayList<Integer>> satisfyingAssignments = c.getSatisfyingAssignments();
-		//start for loop from the end as the remove function shifts the rest of the array down
-        for(int j=satisfyingAssignments.size()-1; j>=0; j--) {
-            if(satisfyingAssignments.get(j).get(cell).equals(new Integer(val))) {
-                System.out.println("cell index "+cell + " satisfyingAssignments index "+ j);
-                System.out.println("satisfyingAssignment.remove( "+ satisfyingAssignments.get(j) + " val "+ val);
-                satisfyingAssignments.remove(j);
-                System.out.println("after constraint size " + c.getSatisfyingAssignments().size() + "\n");
-            }
-        } 
-    }
 
     public static void addNonEssential(String ne){
         if(!nonessential.contains(ne))
