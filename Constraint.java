@@ -17,11 +17,13 @@ public class Constraint {
     private String name;
     private Cell[] variables;
     private ArrayList<ArrayList<Integer>> satisfyingAssignments;
+    public final int preSize;
 
     public Constraint(String name, Cell[] variables, ArrayList<ArrayList<Integer>> satisfyingAssignments) {
         setName(name);
         setVariables(variables);
         setSatisfyingAssignments(satisfyingAssignments);
+        preSize = satisfyingAssignments.size();
     }
 
     public void setName(String name) {

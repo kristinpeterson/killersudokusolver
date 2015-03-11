@@ -31,10 +31,9 @@ public class Main {
 
 	public static void main(String[] argv) throws Exception {
 		/** Get cages from file */
-	    File f = new File("test.txt");
+	    File f = new File("testcase2.txt");
     	FileReader fr = new FileReader(f);
     	BufferedReader br = new BufferedReader(fr);
-
     	String eachLine = br.readLine();
 
     	while (eachLine != null) {
@@ -53,6 +52,7 @@ public class Main {
 
 		File of = new File("output.txt");
 		BufferedWriter output = new BufferedWriter(new FileWriter(of));
+		String separator = "**************************\n";
 
 		/** Find all combinations that add up to each Cage goal */
 		for(Cage aCage : board.getCages()) {
@@ -63,25 +63,34 @@ public class Main {
 			List<Stack<Integer>> possibleSolutions = new ArrayList<Stack<Integer>>();
 			possibleSolutions = board.sumCombinations(stack, sum, 0, goal, size, possibleSolutions);
 			aCage.setSolutions(possibleSolutions);
-			System.out.println("\nPermutated Solutions:\n" + aCage.getPermutatedSolutions());
-			System.out.println(aCage.toString());
-			output.write(aCage.toString());
-		}
-
-		for(Cage aCage : board.getCages()) {
-			//System.out.println(aCage.toString());
-			output.write(aCage.toString());
 		}
 
 		buildConstraints();
 		buildNEfromCageConstraint();
+		reduceFromNE(rowConstraints);
+		reduceFromNE(colConstraints);
+		reduceFromNE(nonetConstraints);
 
-		reduceFromNE();
-		buildNEfromConstraints();
-		reduceFromNE();
-
+		// Temporary output of constraint cardinality before arc consistency has been performed
+		output.write(separator);
 		for(Constraint c : rowConstraints) {
-			System.out.println(c.getName() + "\n\t\t" + "Cardinality of constraint after AC:\t" + c.getSatisfyingAssignments().size());
+			String outputString="Row constraint: "+c.getName() + ":\t" + "Cardinality before AC:\t" + c.preSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size() + "\n";
+			output.write(outputString);
+		}
+		output.write(separator);
+		for(Constraint c : colConstraints) {
+			String outputString="Column constraint: "+c.getName() + ":\t" + "Cardinality before AC:\t" + c.preSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size()+ "\n";
+			output.write(outputString);
+		}
+		output.write(separator);
+		for(Constraint c : cageConstraints) {
+			String outputString="Sum constraint: "+c.getName() + ":\t" + "Cardinality before AC:\t" + c.preSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size()+ "\n";
+			output.write(outputString);
+		}
+		output.write(separator);
+		for(Constraint c : nonetConstraints) {
+			String outputString="Grid constraint: "+c.getName() + ":\t" + "Cardinality before AC:\t" + c.preSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size()+ "\n";
+			output.write(outputString);
 		}
 
         output.close();
@@ -137,32 +146,6 @@ public class Main {
 			Cell[] variables = cage.getCellsAsArray();
 			cageConstraints.add(new Constraint(cage.getCageId(), variables, cage.getPermutatedSolutions()));
 		}
-
-		// Temporary output of constraint cardinality before arc consistency has been performed
-		System.out.println("**************************");
-		System.out.println("ROW CONSTRAINTS");
-		System.out.println("**************************");
-		for(Constraint c : rowConstraints) {
-			System.out.println(c.getName() + "\n\t\t" + "Cardinality of constraint before AC:\t" + c.getSatisfyingAssignments().size());
-		}
-		System.out.println("**************************");
-		System.out.println("COLUMN CONSTRAINTS");
-		System.out.println("**************************");
-		for(Constraint c : colConstraints) {
-			System.out.println(c.getName() + "\n\t\t" + "Cardinality of constraint before AC:\t" + c.getSatisfyingAssignments().size());
-		}
-		System.out.println("**************************");
-		System.out.println("NONET CONSTRAINTS");
-		System.out.println("**************************");
-		for(Constraint c : nonetConstraints) {
-			System.out.println(c.getName() + "\n\t\t" + "Cardinality of constraint before AC:\t" + c.getSatisfyingAssignments().size());
-		}
-		System.out.println("**************************");
-		System.out.println("CAGE CONSTRAINTS");
-		System.out.println("**************************");
-		for(Constraint c : cageConstraints) {
-			System.out.println(c.getName() + "\n\t\t" + "Cardinality of constraint before AC:\t" + c.getSatisfyingAssignments().size());
-		}
 	}
 
 	/**
@@ -184,10 +167,10 @@ public class Main {
 		}
 	}
 
-	private static void buildNEfromConstraints() {
+	private static void buildNEfromConstraints(ArrayList<Constraint> allConstraints) {
 
 		boolean one=false,two=false,three=false,four=false,five=false,six=false,seven=false,eight=false,nine =false;
-		for (Constraint c : rowConstraints) {
+		for (Constraint c : allConstraints) {
 			ArrayList<ArrayList<Integer>> cSat = c.getSatisfyingAssignments();
 			Cell[] cells = c.getVariables();
 			for (int i=0; i<cells.length; i++) {
@@ -250,10 +233,7 @@ public class Main {
 	 * from rowConstraints
 	 *
 	 */
-	private static void reduceFromNE() {
-		ArrayList<Constraint> allConstraints = rowConstraints;
-		allConstraints.addAll(colConstraints);
-		allConstraints.addAll(nonetConstraints);
+	private static void reduceFromNE(ArrayList<Constraint> allConstraints) {
 
 		for(String s: nonessential.keySet()) {
 			// info[1] is y
