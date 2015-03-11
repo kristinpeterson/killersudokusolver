@@ -36,7 +36,7 @@ public class Constraint {
         this.variables = variables;
     }
 
-    public Cell[] getVaribles() {
+    public Cell[] getVariables() {
         return variables;
     }
 
@@ -46,6 +46,28 @@ public class Constraint {
 
     public ArrayList<ArrayList<Integer>> getSatisfyingAssignments() {
         return satisfyingAssignments;
+    }
+
+    public void removeAssignment(int cell, int val){
+                for(int j=satisfyingAssignments.size()-1; j>=0; j--) {
+                    //System.out.println("cell j "+cell + j);
+                    if(satisfyingAssignments.get(j).get(cell).equals(new Integer(val))) {
+                        System.out.println("cell j "+cell + j);
+                        System.out.println("satisfyingAssignment.get(i "+ satisfyingAssignments.get(j) + " val "+ val);
+                        //satisfyingAssignments.remove(satisfyingAssignments.get(j));
+                    }
+                } 
+    }
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Constraint "+name +"\n");
+        for(int i=0; i<variables.length; i++){
+            sb.append("Cell " +i + ": " +variables[i].toString()+"\n");
+            //sb.append(satisfyingAssignments.get(i));
+        }
+        sb.append(satisfyingAssignments);
+        return sb.toString();
     }
 
 }
