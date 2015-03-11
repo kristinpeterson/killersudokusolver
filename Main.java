@@ -77,6 +77,8 @@ public class Main {
 		buildNEfromCageConstraint();
 
 		reduceFromNE();
+		buildNEfromConstraints();
+		reduceFromNE();
 
 		for(Constraint c : rowConstraints) {
 			System.out.println(c.getName() + "\n\t\t" + "Cardinality of constraint after AC:\t" + c.getSatisfyingAssignments().size());
@@ -182,12 +184,9 @@ public class Main {
 		}
 	}
 
-	private static void buildNEfromRow() {
+	private static void buildNEfromConstraints() {
+
 		boolean one=false,two=false,three=false,four=false,five=false,six=false,seven=false,eight=false,nine =false;
-		boolean[] check = new boolean[9];
-		for (boolean a: check ) {
-			a = false;
-		}
 		for (Constraint c : rowConstraints) {
 			ArrayList<ArrayList<Integer>> cSat = c.getSatisfyingAssignments();
 			Cell[] cells = c.getVariables();
@@ -205,40 +204,41 @@ public class Main {
 						case 9: nine=true;
 					}
 				}
-				if(one){
-					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 1);
+				String prefix = "cell_" + cells[i].getY() + "_" + cells[i].getX();
+				if(!one){
+					addNonEssential(prefix, 1); 
 					one=false;
 				}
-				if(two){
-					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 2);
+				if(!two){
+					addNonEssential(prefix, 2);
 					two=false;
 				}
-				if(three){
-					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 3);
+				if(!three){
+					addNonEssential(prefix, 3);
 					one=false;
 				}
-				if(four){
-					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 4);
+				if(!four){
+					addNonEssential(prefix, 4);
 					four=false;
 				}
-				if(five){
-					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 5);
+				if(!five){
+					addNonEssential(prefix, 5);
 					five=false;
 				}
-				if(six){
-					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 6);
+				if(!six){
+					addNonEssential(prefix, 6);
 					six=false;
 				}
-				if(seven){
-					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 7);
+				if(!seven){
+					addNonEssential(prefix, 7);
 					seven=false;
 				}
-				if(eight){
-					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 8);
+				if(!eight){
+					addNonEssential(prefix, 8);
 					eight=false;
 				}
-				if(nine){
-					addNonEssential("cell_" + cells[i].getY() + "_" + cells[i].getX(), 9);
+				if(!nine){
+					addNonEssential(prefix, 9);
 					nine=false;
 				}
 			}
@@ -273,8 +273,8 @@ public class Main {
 						}
 					}
 				}
+				//buildNEfromConstraint(c); //check to see if we can add any non-essentials
 			}
-			nonessential.put(s, new ArrayList<Integer>());
 		}
 	}
 
