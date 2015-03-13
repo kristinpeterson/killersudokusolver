@@ -66,12 +66,16 @@ public class Main {
 		}
 
 		buildConstraints();
+		ArrayList<Constraint> constraintList = new ArrayList<Constraint>(cageConstraints);
+        constraintList.addAll(colConstraints);
+        constraintList.addAll(nonetConstraints);
+        constraintList.addAll(rowConstraints);
+        Tree base = new Tree(board, constraintList);
 
-        Tree base = new Tree(board, rowConstraints, colConstraints, cageConstraints, nonetConstraints);
         ArrayList<Tree> next = new ArrayList<Tree>();
         if (base.canBearChild()) {
         	//create child
-        	next = base.createChild(board.getCell(1,1));
+        	next = base.createChild();
         }
         System.out.println(next.toString());
 
@@ -206,6 +210,8 @@ public class Main {
 			swap(values, fromIndex, j);
 		}
 	}
+
+
 	private static ArrayList<Integer> convertArrayToList(int[] num) {
 		ArrayList<Integer> item = new ArrayList<Integer>();
 		for (int h = 0; h < num.length; h++) {

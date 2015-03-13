@@ -10,24 +10,21 @@ public class Tree{
 	static ArrayList<Constraint> appliedConstraints = new ArrayList<Constraint>();
 	static Hashtable<String, ArrayList<Integer>> nonessential = new Hashtable<String, ArrayList<Integer>>();
 
-	public Tree(Board b, ArrayList<Constraint> rowConstraints, ArrayList<Constraint> colConstraints, 
-				ArrayList<Constraint> cageConstraints, ArrayList<Constraint> nonetConstraints){ // create root of tree
+	public Tree(Board b, ArrayList<Constraint> allConstraints){ // create root of tree
 		depth = 0;
 		parent = null;
 		newAssignment = null;
 		treeBoard = b;
-		for (Constraint c: rowConstraints ) {
+		for (Constraint c: allConstraints ) {
 			appliedConstraints.add(c);
 		}
-		for (Constraint c: colConstraints ) {
-			appliedConstraints.add(c);
+
+		applyArcConsistency();
+		appliedConstraints = sortConstraintBySize(appliedConstraints);
+		for (Constraint c: appliedConstraints ) {
+			System.out.println("Constraint " +c.getName() + " size " +c.getSatisfyingAssignments().size());
 		}
-		for (Constraint c: nonetConstraints ) {
-			appliedConstraints.add(c);
-		}
-		for (Constraint c: cageConstraints ) {
-			appliedConstraints.add(c);
-		}
+
 	}
 
 	public Tree(Board b, Cell c, int d, Tree p, ArrayList<Constraint> ac){
@@ -35,11 +32,7 @@ public class Tree{
 		newAssignment = c;
 		parent = p;
 		treeBoard = b;
-		appliedConstraints = ac;
-		
-		//Apply arc consistency at every level
-		buildNEfromConstraints();
-		reduceFromNE();
+		applyArcConsistency();
 	}
 
 	public boolean canBearChild(){
@@ -50,21 +43,59 @@ public class Tree{
 		return true;
 	}
 
-	public ArrayList<Tree> createChild(Cell c){
+	public ArrayList<Tree> createChild(){
 		ArrayList<Tree> newLevel = new ArrayList<Tree>();
-		Board child = treeBoard;
+		Board child = this.treeBoard;
+		Cell c = getNextLevel();
 		c = child.getCell(c.getX(), c.getY());
+		ArrayList<Constraint> conClone = new ArrayList<Constraint>();
+		for (Constraint con: appliedConstraints ) {
+			conClone.add(con);
+		}
 		for(Integer i : c.getSolutions()){
 			Cell next = new Cell(c.getX(), c.getY());
 			next.setValue(i);
 			child.addCell(next);
-			newLevel.add(new Tree(child, next, depth+1, this, appliedConstraints));
+			newLevel.add(new Tree(child, next, depth+1, this, conClone));
 		}
 		return newLevel;
 	}
 
-	//order by size to make more effective filter (smaller tree)
-	//make reduce return new constraint array?
+	private Cell getNextLevel(){
+		for (Constraint c: appliedConstraints) {
+			if(c.getSatisfyingAssignments().size() > 1){
+				for (Cell cell : c.getVariables()){
+					if (cell.getSolutions().size() > 1)
+						return cell;
+				}
+			}
+		}
+		return new Cell(0,0);
+	}
+
+	private void applyArcConsistency(){
+		buildNEfromCageConstraint();
+		reduceFromNE();
+		buildNEfromConstraints();
+		reduceFromNE();
+	}
+
+	private static void buildNEfromCageConstraint() {
+		for (Constraint c : appliedConstraints) {
+			if (!c.getName().startsWith("C")) {
+				for (Cell cell : c.getVariables()) {
+					ArrayList<Integer> ps = cell.getSolutions();
+					if (ps.size() < 9) {
+						for (int n = 1; n < 10; n++) {
+							if (!ps.contains(new Integer(n))) {
+								addNonEssential("cell_" + cell.getY() + "_" + cell.getX(), n);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
 	private void buildNEfromConstraints() {
 
@@ -133,7 +164,6 @@ public class Tree{
 	 *
 	 */
 	private void reduceFromNE() {
-
 		for(String s: nonessential.keySet()) {
 			// info[1] is y
 			// info[2] is x
@@ -164,8 +194,43 @@ public class Tree{
     	}
     	temp.add(new Integer(val));
     	nonessential.put(ne, temp);
-        
     }
+
+    private static ArrayList<Constraint> sortConstraintBySize(ArrayList<Constraint> ac) {
+		ArrayList<Constraint> sorted = new ArrayList<Constraint>();
+		//Base cases as this method is recursive
+		if(ac.size()<=1){
+			return ac;
+		} else if (ac.size() == 2){
+			if(ac.get(0).getSatisfyingAssignments().size() < ac.get(1).getSatisfyingAssignments().size())
+				return ac;
+			else{
+				sorted.add(ac.get(1));
+				sorted.add(ac.get(0));
+				return sorted;
+			}
+		}
+		ArrayList<Constraint> smaller = new ArrayList<Constraint>();
+		ArrayList<Constraint> bigger = new ArrayList<Constraint>();
+		ArrayList<Constraint> equal = new ArrayList<Constraint>();
+		int pindex = ac.size()/2;
+		int pivot = ac.get(pindex).getSatisfyingAssignments().size(); //size of middle element as pivot
+		for (int h = 0; h < ac.size(); h++) {
+			if (h!=pindex){
+				if(ac.get(h).getSatisfyingAssignments().size() > pivot)
+					bigger.add(ac.get(h));
+				if(ac.get(h).getSatisfyingAssignments().size() < pivot)
+					smaller.add(ac.get(h));
+				if(ac.get(h).getSatisfyingAssignments().size() == pivot)
+					equal.add(ac.get(h));
+			}
+		}
+		smaller = sortConstraintBySize(smaller);
+		smaller.addAll(equal);
+		bigger = sortConstraintBySize(bigger);
+		smaller.addAll(bigger);
+		return smaller;
+	}
 
     public String toString() {
     	StringBuilder sb = new StringBuilder();
