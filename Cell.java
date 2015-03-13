@@ -52,10 +52,21 @@ public class Cell{
 
 	public void setValue(Integer num){
 		value = num.intValue();
+		possibleSolutions.clear();
+		addSolution(num);
 	}
 
 	public boolean equals(Cell c){
 		return this.x == c.getX() && this.y == c.getY();
+	}
+
+	public boolean update(Cell c){
+		if(this.equals(c)){
+			this.value = c.value;
+			possibleSolutions = c.getSolutions();
+			return false;
+		}
+		return false;
 	}
 
 	public int getValue(){

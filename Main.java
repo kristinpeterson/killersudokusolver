@@ -66,34 +66,14 @@ public class Main {
 		}
 
 		buildConstraints();
-		buildNEfromCageConstraint();
-		reduceFromNE(rowConstraints);
-		reduceFromNE(colConstraints);
-		reduceFromNE(nonetConstraints);
 
-		// Temporary output of constraint cardinality before arc consistency has been performed
-		output.write(separator);
-		for(Constraint c : rowConstraints) {
-			String outputString="Row constraint: "+c.getName() + ":\t" + "Cardinality before AC:\t" + c.preSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size() + "\n";
-			output.write(outputString);
-		}
-		output.write(separator);
-		for(Constraint c : colConstraints) {
-			String outputString="Column constraint: "+c.getName() + ":\t" + "Cardinality before AC:\t" + c.preSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size()+ "\n";
-			output.write(outputString);
-		}
-		output.write(separator);
-		for(Constraint c : cageConstraints) {
-			String outputString="Sum constraint: "+c.getName() + ":\t" + "Cardinality before AC:\t" + c.preSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size()+ "\n";
-			output.write(outputString);
-		}
-		output.write(separator);
-		for(Constraint c : nonetConstraints) {
-			String outputString="Grid constraint: "+c.getName() + ":\t" + "Cardinality before AC:\t" + c.preSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size()+ "\n";
-			output.write(outputString);
-		}
-
-        output.close();
+        Tree base = new Tree(board, rowConstraints, colConstraints, cageConstraints, nonetConstraints);
+        ArrayList<Tree> next = new ArrayList<Tree>();
+        if (base.canBearChild()) {
+        	//create child
+        	next = base.createChild(board.getCell(1,1));
+        }
+        System.out.println(next.toString());
 
 	}
 
@@ -163,7 +143,7 @@ public class Main {
 	 * Builds the nonessential list
 	 *
 	 */
-	private static void buildNEfromCageConstraint() {
+	/*private static void buildNEfromCageConstraint() {
 		for (Constraint c : cageConstraints) {
 			for (Cell cell : c.getVariables()) {
 				ArrayList<Integer> ps = cell.getSolutions();
@@ -176,108 +156,7 @@ public class Main {
 				}
 			}
 		}
-	}
-
-	private static void buildNEfromConstraints(ArrayList<Constraint> allConstraints) {
-
-		boolean one=false,two=false,three=false,four=false,five=false,six=false,seven=false,eight=false,nine =false;
-		for (Constraint c : allConstraints) {
-			ArrayList<ArrayList<Integer>> cSat = c.getSatisfyingAssignments();
-			Cell[] cells = c.getVariables();
-			for (int i=0; i<cells.length; i++) {
-				for(ArrayList<Integer> foo: cSat){
-					switch(foo.get(i)){
-						case 1: one=true;
-						case 2: two=true;
-						case 3: three=true;
-						case 4: four=true;
-						case 5: five=true;
-						case 6: six=true;
-						case 7: seven=true;
-						case 8: eight=true;
-						case 9: nine=true;
-					}
-				}
-				String prefix = "cell_" + cells[i].getY() + "_" + cells[i].getX();
-				if(!one){
-					addNonEssential(prefix, 1); 
-					one=false;
-				}
-				if(!two){
-					addNonEssential(prefix, 2);
-					two=false;
-				}
-				if(!three){
-					addNonEssential(prefix, 3);
-					one=false;
-				}
-				if(!four){
-					addNonEssential(prefix, 4);
-					four=false;
-				}
-				if(!five){
-					addNonEssential(prefix, 5);
-					five=false;
-				}
-				if(!six){
-					addNonEssential(prefix, 6);
-					six=false;
-				}
-				if(!seven){
-					addNonEssential(prefix, 7);
-					seven=false;
-				}
-				if(!eight){
-					addNonEssential(prefix, 8);
-					eight=false;
-				}
-				if(!nine){
-					addNonEssential(prefix, 9);
-					nine=false;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Goes through the nonessential list and removes non-essential assignments
-	 * from rowConstraints
-	 *
-	 */
-	private static void reduceFromNE(ArrayList<Constraint> allConstraints) {
-
-		for(String s: nonessential.keySet()) {
-			// info[1] is y
-			// info[2] is x
-			String[] info = s.split("_");
-			for (Constraint c : allConstraints) {
-				Cell[] cells = c.getVariables();
-				for(int j = 0; j < cells.length; j++) {
-					//if you've found the right cell
-					if (cells[j].getY() == Integer.parseInt(info[1]) && cells[j].getX() == Integer.parseInt(info[2])){
-						//pull the arraylist of nonessential values from the hash table
-						ArrayList<Integer> temp = nonessential.get(s); 
-						//loop through the array list and remove each nonessential from the constraint and cell
-						for(Integer assignment: temp){
-							c.removeAssignment(j, assignment);
-							cells[j].removeSolution(assignment);
-						}
-					}
-				}
-				//buildNEfromConstraint(c); //check to see if we can add any non-essentials
-			}
-		}
-	}
-
-    public static void addNonEssential(String ne, int val){
-    	ArrayList<Integer> temp = new ArrayList<Integer>();
-    	if(nonessential.containsKey(ne)){
-    		temp = nonessential.get(ne);
-    	}
-    	temp.add(new Integer(val));
-    	nonessential.put(ne, temp);
-        
-    }
+	}*/
 
 	/**
 	 * Builds the initial satisfying assignment list for Row and Column constraints

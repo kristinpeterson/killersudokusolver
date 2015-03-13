@@ -41,6 +41,12 @@ public class Board {
     }
 
     public void addCell(Cell cell){
+        for (Cell c : cells){
+            if (c.equals(cell)){
+                c.update(cell); //override previous cell solutions
+                return;
+            }
+        }
         cells.add(cell);
     }
 
