@@ -137,8 +137,19 @@ public class Main {
 
 		// Build nonetConstraints
 		for(int n = 1; n <= Board.NONET_SIZE; n++) {
-			String nonetName = "Cn" + n;
-			nonetConstraints.add(new Constraint(nonetName, board.getNonetCells(n), nonetInitSatisfyingAssignments));
+			String nonetName = "Cn" + n +"x";
+			Cell[] cells = board.getNonetCells(n);
+
+			for(int r = 1; r < 9; r++) {
+				for(int i = r; i < 9; i++) {
+					if (r != i) {
+						String constraintName = nonetName + cells[r].getY() + cells[r].getX() + "x" + cells[i].getY() + cells[i].getX();
+						Cell[] variables = {cells[r], cells[i]};
+						Constraint constraint = new Constraint(constraintName, variables, rcInitSatisfyingAssignments);
+						nonetConstraints.add(constraint);
+					}
+				}
+			}
 		}
 
 		// Build cageConstraints
