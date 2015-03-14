@@ -73,9 +73,20 @@ public class Main {
         Tree base = new Tree(board, constraintList);
 
         ArrayList<Tree> next = new ArrayList<Tree>();
-        if (base.canBearChild()) {
+        boolean canBearChild = base.canBearChild();
+        int maxDepth = 1;
+        next = base.createChild();
+        while (canBearChild && maxDepth < 3) {
         	//create child
-        	next = base.createChild();
+        	ArrayList<Tree> next2 = new ArrayList<Tree>();
+        	for( Tree t: next){
+        		if(t.getDepth() == maxDepth){
+        			next2 = t.createChild();
+        			//next.addAll(next2);
+        		}
+        	}
+        	next.addAll(next2);
+        	maxDepth++;
         }
         System.out.println(next.toString());
 

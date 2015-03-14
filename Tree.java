@@ -242,4 +242,8 @@ public class Tree{
 		return sb.toString();
 	}
 
+	public int getDepth(){
+		return depth;
+	}
+
 }
