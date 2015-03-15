@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Stack;
 
@@ -22,10 +23,13 @@ public class Board {
 
     private ArrayList<Cage> cages;
     private ArrayList<Cell> cells;
+    private ArrayList<Constraint> constraints;
+    private Hashtable<String, ArrayList<Integer>> nonessential = new Hashtable<String, ArrayList<Integer>>();
 
     public Board(){
         cages = new ArrayList<Cage>();
         cells = new ArrayList<Cell>();
+        constraints = new ArrayList<Constraint>();
     }
 
     public void addCage(Cage c){
@@ -36,8 +40,52 @@ public class Board {
         return cages;
     }
 
-    public ArrayList<Cell> getCells(){
+    public ArrayList<Cell> getCells() {
         return cells;
+    }
+
+    public void orderCellsAscending(){
+        ArrayList<Cell> orderedCells = new ArrayList<Cell>();
+        ArrayList<Cell> zero = new ArrayList<Cell>();
+        ArrayList<Cell> one = new ArrayList<Cell>();
+        ArrayList<Cell> two = new ArrayList<Cell>();
+        ArrayList<Cell> three = new ArrayList<Cell>();
+        ArrayList<Cell> four = new ArrayList<Cell>();
+        ArrayList<Cell> five = new ArrayList<Cell>();
+        ArrayList<Cell> six = new ArrayList<Cell>();
+        ArrayList<Cell> seven = new ArrayList<Cell>();
+        ArrayList<Cell> eight = new ArrayList<Cell>();
+        ArrayList<Cell> nine = new ArrayList<Cell>();
+        for(Cell c : cells) {
+            switch(c.getDomain().size()) {
+                case 0: zero.add(c); break;
+                case 1: one.add(c); break;
+                case 2: two.add(c); break;
+                case 3: three.add(c); break;
+                case 4: four.add(c); break;
+                case 5: five.add(c); break;
+                case 6: six.add(c); break;
+                case 7: seven.add(c); break;
+                case 8: eight.add(c); break;
+                case 9: nine.add(c); break;
+            }
+        }
+        orderedCells.addAll(zero);
+        orderedCells.addAll(one);
+        orderedCells.addAll(two);
+        orderedCells.addAll(three);
+        orderedCells.addAll(four);
+        orderedCells.addAll(five);
+        orderedCells.addAll(six);
+        orderedCells.addAll(seven);
+        orderedCells.addAll(eight);
+        orderedCells.addAll(nine);
+
+        cells.clear();
+        for(Cell cell: orderedCells) {
+            cells.add(cell);
+        }
+        orderedCells.clear();
     }
 
     public void addCell(Cell cell){
@@ -67,6 +115,24 @@ public class Board {
     }
 
     /**
+     * Returns list of all constraints on this board
+     *
+     */
+    public ArrayList<Constraint> getConstraints() {
+        return constraints;
+    }
+
+    /**
+     * Sets list of all constraints on this board
+     *
+     */
+    public void setConstraints(ArrayList<Constraint> constraints) {
+        for(Constraint constraint : constraints) {
+            this.constraints.add(constraint);
+        }
+    }
+    
+    /**
      * Returns an array of Cells for the given nonet number
      * 	1 2 3
      *  4 5 6
@@ -87,6 +153,31 @@ public class Board {
             }
         }
         return cells;
+    }
+
+    public Hashtable<String, ArrayList<Integer>> getNonessential() {
+        return nonessential;
+    }
+
+    public Board copy() {
+        Board copy = new Board();
+
+        // copy cages
+        for(Cage cage : this.cages) {
+            copy.cages.add(cage);
+        }
+
+        // copy cells
+        for(Cell cell : this.cells) {
+            copy.cells.add(cell);
+        }
+
+        // copy constraints
+        for(Constraint constraint : this.constraints) {
+            copy.constraints.add(constraint);
+        }
+
+        return copy;
     }
 
     /**

@@ -17,7 +17,7 @@ import java.util.Stack;
  * @author Ariel Katz
  *
  */
-public class Cage{
+public class Cage {
 
 	private int goal;
 	private ArrayList<Cell> cells;
@@ -107,7 +107,7 @@ public class Cage{
 			while (!stack.empty()) {
 				Integer k = stack.pop();
 				for (Cell cell : cells) {
-					cell.addSolution(k);
+					cell.addDomainValue(k);
 				}
 			}
 		}

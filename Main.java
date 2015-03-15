@@ -1,12 +1,9 @@
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.File;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import java.util.Hashtable;
 
 /**
  * COURSE: CECS-551 AI
@@ -25,21 +22,16 @@ public class Main {
 	static ArrayList<Constraint> colConstraints = new ArrayList<Constraint>();
 	static ArrayList<Constraint> nonetConstraints = new ArrayList<Constraint>();
 	static ArrayList<Constraint> cageConstraints = new ArrayList<Constraint>();
-	static Hashtable<String, ArrayList<Integer>> nonessential = new Hashtable<String, ArrayList<Integer>>();
 
 	static Board board = new Board();
 
 	public static void main(String[] argv) throws Exception {
 		/** Get cages from file */
-	    File f = new File("testcase2.txt");
-    	FileReader fr = new FileReader(f);
-    	BufferedReader br = new BufferedReader(fr);
-    	String eachLine = br.readLine();
-
-    	while (eachLine != null) {
-    		board.addCage(new Cage(eachLine.split(",")));
-      		eachLine = br.readLine();
-    	}
+		try {
+			getCagesFromFile();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		// Add cells to board
 		for(Cage cage : board.getCages()) {
@@ -48,13 +40,10 @@ public class Main {
 			}
 		}
 
-		/* Iteration 1 output */
-
-		File of = new File("output.txt");
-		BufferedWriter output = new BufferedWriter(new FileWriter(of));
-		String separator = "**************************\n";
-
-		/** Find all combinations that add up to each Cage goal */
+		/**
+		 * Find all combinations of possible solutions
+		 * that add up to each Cage goal
+		 */
 		for(Cage aCage : board.getCages()) {
 			int goal = aCage.getGoal();
 			int size = aCage.getCells().size();
@@ -65,42 +54,84 @@ public class Main {
 			aCage.setSolutions(possibleSolutions);
 		}
 
+		// Build list of all problem constraints
 		buildConstraints();
-		ArrayList<Constraint> constraintList = new ArrayList<Constraint>(cageConstraints);
-        constraintList.addAll(colConstraints);
-        constraintList.addAll(nonetConstraints);
-        constraintList.addAll(rowConstraints);
-        Tree base = new Tree(board, constraintList);
 
-        ArrayList<Tree> next = new ArrayList<Tree>();
-        boolean canBearChild = base.canBearChild();
-        int maxDepth = 1;
-        next = base.createChild();
-        while (canBearChild && maxDepth < 3) {
-        	//create child
-        	ArrayList<Tree> next2 = new ArrayList<Tree>();
-        	for( Tree t: next){
-        		if(t.getDepth() == maxDepth){
-        			next2 = t.createChild();
-        			//next.addAll(next2);
-        		}
-        	}
-        	next.addAll(next2);
-        	maxDepth++;
-        }
-        System.out.println(next.toString());
+		Util.applyArcConsistency(board);
 
+		// Print Milestone 1 output (before clearing categorized constraint lists)
+		Util.printM1Output();
+
+		// Create tree to search for solution
+		board.orderCellsAscending(); // orders cells in increasing satisfying assignment order
+		Tree tree = new Tree();
+		TreeNode root = new TreeNode();
+		tree.setRoot(root);
+		List<TreeNode> currentLevel = new ArrayList<TreeNode>();
+		List<TreeNode> nextLevel = new ArrayList<TreeNode>();
+		currentLevel.add(root);
+		// Create new level for each cell in the board
+		for(int i = 0; i < board.getCells().size() - 1; i++) {
+			Cell currentCell = board.getCells().get(i);
+			System.out.println(currentCell);
+
+			// Iterate through nodes in current level and:
+			// + add children
+			// + add child nodes of currentLevel to nextLevel
+			for(int j = currentLevel.size() - 1; j >= 0; j--) {
+				TreeNode aNode = currentLevel.get(j);
+				for(Integer value : currentCell.getDomain()) {
+					TreeNode newNode = new TreeNode(aNode.getBoard(), value, currentCell);
+					if(newNode.canBearChildren()) {
+						// Only add node if it can bear children
+						aNode.addChild(newNode);
+						nextLevel.add(newNode);
+					}
+				}
+				currentLevel.remove(j);
+				aNode.deleteBoard();
+			}
+
+			// Update current level to next level
+			for (int j = 0; j < nextLevel.size(); j++) {
+				TreeNode aNode = nextLevel.get(j);
+				currentLevel.add(aNode);
+				nextLevel.remove(j);
+			}
+			System.out.println("level #:\t" + i + "\tNumber of nodes on level\t" + nextLevel.size() + ": " + nextLevel.toString());
+
+		}
 	}
 
 	/**
-	 * Builds all constraint sets: row, column, nonet
+	 * Get cages from text file
 	 *
-	 * TODO: add representation of cage constraints as set of Constraint objects
+	 */
+	private static void getCagesFromFile() throws Exception {
+		try {
+			File f = new File("testcase2.txt");
+			FileReader fr = new FileReader(f);
+			BufferedReader br = new BufferedReader(fr);
+			String eachLine = br.readLine();
+
+			while (eachLine != null) {
+				board.addCage(new Cage(eachLine.split(",")));
+				eachLine = br.readLine();
+			}
+			fr.close();
+			br.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Builds all constraint sets: row, column, nonet, cage
+	 *
 	 */
 	private static void buildConstraints() {
 		// Starting satisfying assignments for constraints
 		ArrayList<ArrayList<Integer>> rcInitSatisfyingAssignments = buildInitialRCSA();
-		ArrayList<ArrayList<Integer>> nonetInitSatisfyingAssignments = buildInitialNonetSA();
 
 		// Build rowConstraints
 		for(int r = 1; r <= Board.SIZE; r++) {
@@ -152,26 +183,14 @@ public class Main {
 			Cell[] variables = cage.getCellsAsArray();
 			cageConstraints.add(new Constraint(cage.getCageId(), variables, cage.getPermutatedSolutions()));
 		}
-	}
 
-	/**
-	 * Builds the nonessential list
-	 *
-	 */
-	/*private static void buildNEfromCageConstraint() {
-		for (Constraint c : cageConstraints) {
-			for (Cell cell : c.getVariables()) {
-				ArrayList<Integer> ps = cell.getSolutions();
-				if (ps.size() < 9) {
-					for (int n = 1; n < 10; n++) {
-						if (!ps.contains(new Integer(n))) {
-							addNonEssential("cell_" + cell.getY() + "_" + cell.getX(), n);
-						}
-					}
-				}
-			}
-		}
-	}*/
+		// Assign all constraints to the puzzle Board.constraints member
+		ArrayList<Constraint> allConstraints = new ArrayList<Constraint>(cageConstraints);
+		allConstraints.addAll(colConstraints);
+		allConstraints.addAll(nonetConstraints);
+		allConstraints.addAll(rowConstraints);
+		board.setConstraints(allConstraints);
+	}
 
 	/**
 	 * Builds the initial satisfying assignment list for Row and Column constraints
@@ -192,50 +211,4 @@ public class Main {
 		}
 		return assignmentList;
 	}
-
-	/**
-	 * Builds the initial satisfying assignment list for Nonet constraints
-	 *
-	 * @return a list of all satisfying assignments (before pruning)
-	 */
-	private static ArrayList<ArrayList<Integer>> buildInitialNonetSA() {
-		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
-		permuteNonetSA(Board.POSSIBLE_VALUES, 0, result);
-		return result;
-	}
-
-	/**
-	 * Recursive method to find all unique permutations of nonet satisfying assignments
-	 *
-	 * @return a list of all satisfying assignments (before pruning)
-	 */
-	private static void permuteNonetSA(int[] values, int fromIndex, ArrayList<ArrayList<Integer>> result) {
-		if (fromIndex >= values.length) {
-			ArrayList<Integer> item = convertArrayToList(values);
-			result.add(item);
-		}
-
-		for (int j = fromIndex; j <= values.length - 1; j++) {
-			swap(values, fromIndex, j);
-			permuteNonetSA(values, fromIndex + 1, result);
-			swap(values, fromIndex, j);
-		}
-	}
-
-
-	private static ArrayList<Integer> convertArrayToList(int[] num) {
-		ArrayList<Integer> item = new ArrayList<Integer>();
-		for (int h = 0; h < num.length; h++) {
-			item.add(num[h]);
-		}
-		return item;
-	}
-
-	private static void swap(int[] a, int i, int j) {
-		int temp = a[i];
-		a[i] = a[j];
-		a[j] = temp;
-	}
-
-
 }

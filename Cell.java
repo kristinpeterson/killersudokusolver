@@ -16,26 +16,21 @@ public class Cell{
 	private int x;
 	private int y;
 	private int value;
-	private ArrayList<Integer> possibleSolutions;
+	private ArrayList<Integer> domain;
+	private ArrayList<Constraint> constraints; // constraints associated w/ this cell
 
 	public Cell(int x, int y){
 		this.x = x;
 		this.y = y;
-		possibleSolutions = new ArrayList<Integer>();
+		domain = new ArrayList<Integer>();
+		constraints = new ArrayList<Constraint>();
 	}
 
 	public Cell(String xs, String ys){
 		x = Integer.parseInt(xs);
 		y = Integer.parseInt(ys);
-		possibleSolutions = new ArrayList<Integer>();
-	}
-
-	public void setX(int x){
-		this.x = x;
-	}
-
-	public void setY(int y){
-		this.y = y;
+		domain = new ArrayList<Integer>();
+		constraints = new ArrayList<Constraint>();
 	}
 
 	public int getX(){
@@ -46,14 +41,26 @@ public class Cell{
 		return y;
 	}
 
-	public void setValue(int num){
-		value = num;
+	public void addConstraint(Constraint constraint) {
+		constraints.add(constraint);
+	}
+
+	public ArrayList<Constraint> getConstraints() {
+		ArrayList<Constraint> clone = new ArrayList<Constraint>();
+		for(Constraint c : constraints) {
+			clone.add(c);
+		}
+		return clone;
 	}
 
 	public void setValue(Integer num){
 		value = num.intValue();
-		possibleSolutions.clear();
-		addSolution(num);
+		domain.clear();
+		addDomainValue(num);
+	}
+
+	public int getValue() {
+		return value;
 	}
 
 	public boolean equals(Cell c){
@@ -63,32 +70,24 @@ public class Cell{
 	public boolean update(Cell c){
 		if(this.equals(c)){
 			this.value = c.value;
-			possibleSolutions = c.getSolutions();
+			domain = c.getDomain();
 			return false;
 		}
 		return false;
 	}
 
-	public int getValue(){
-		return value;
+	public void addDomainValue(Integer i){
+		if(!domain.contains(i))
+			domain.add(i);
 	}
 
-	public boolean isSolution(Integer i){
-		return possibleSolutions.contains(i);
+	public boolean removeAssignment(Integer i){
+		return domain.remove(i);
 	}
 
-	public void addSolution(Integer i){
-		if(!possibleSolutions.contains(i))
-			possibleSolutions.add(i);
-	}
-
-	public boolean removeSolution(Integer i){
-		return possibleSolutions.remove(i);
-	}
-
-	public ArrayList<Integer> getSolutions() {
+	public ArrayList<Integer> getDomain() {
 		ArrayList<Integer> solutionsClone = new ArrayList<Integer>();
-		for (Integer i : possibleSolutions) {
+		for (Integer i : domain) {
 			solutionsClone.add(i);
 		}
 		return solutionsClone;
@@ -130,7 +129,7 @@ public class Cell{
 	}
 
 	public String toString() {
-		return "x: " + x + " y: " + y + " domain: " + getSolutions() + "\n";
+		return "x: " + x + " y: " + y + " domain: " + getDomain() + "\n";
 	}
 
 }

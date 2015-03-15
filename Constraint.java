@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -5,9 +6,9 @@ import java.util.ArrayList;
  * PROFESSOR: Todd Ebert
  * PROJECT: Killer Sudoku Solver
  *
- * Represents a Killer Sudoku puzzle,
- *
- * Killer Sudoku is a puzzle that combines elements of Sudoku and Kakuro.
+ * Represents the a constraint on the Killer Sudoku puzzle.
+ * Each constraint has a set of associated variables (Cells) and
+ * satisfying assignments for the constraint.
  *
  * @author Kristin Peterson
  * @author Ariel Katz
@@ -17,7 +18,7 @@ public class Constraint {
     private String name;
     private Cell[] variables;
     private ArrayList<ArrayList<Integer>> satisfyingAssignments;
-    public final int preSize;
+    public final int preSize; // initial number of satisfying assignments
 
     public Constraint(String name, Cell[] variables, ArrayList<ArrayList<Integer>> satisfyingAssignments) {
         setName(name);
@@ -61,6 +62,29 @@ public class Constraint {
                 satisfyingAssignments.remove(j);
             }
         }
+    }
+
+    /**
+     * Checks if the given cell/value combination is a satisfying assignment
+     * for this constraint
+     *
+     * @param cell
+     * @param value
+     * @return true if the given cell/value
+     */
+    public boolean isSatisfyingAssignment(Cell cell, Integer value) {
+        int index = 0;
+        for(int i = 0; i < variables.length; i++) {
+            if(variables[i].equals(cell)) {
+                index = i;
+            }
+        }
+        for(ArrayList<Integer> satisfyingAssignment : satisfyingAssignments) {
+            if(satisfyingAssignment.get(index).equals(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String toString(){
