@@ -60,7 +60,7 @@ public class Main {
 		Util.applyArcConsistency(board);
 
 		// Print Milestone 1 output (before clearing categorized constraint lists)
-		Util.printM1Output();
+		//Util.printM1Output();
 
 		// Create tree to search for solution
 		board.orderCellsAscending(); // orders cells in increasing satisfying assignment order
@@ -71,35 +71,41 @@ public class Main {
 		List<TreeNode> nextLevel = new ArrayList<TreeNode>();
 		currentLevel.add(root);
 		// Create new level for each cell in the board
-		for(int i = 0; i < board.getCells().size() - 1; i++) {
+		for(int i = 0; i < 5; i++){//board.getCells().size() - 1; i++) {
 			Cell currentCell = board.getCells().get(i);
-			System.out.println(currentCell);
 
 			// Iterate through nodes in current level and:
 			// + add children
 			// + add child nodes of currentLevel to nextLevel
 			for(int j = currentLevel.size() - 1; j >= 0; j--) {
 				TreeNode aNode = currentLevel.get(j);
+				//System.out.println("current cell pre "+currentCell.toString());
+				ArrayList<Constraint> currentConstraints = board.getConstraintsClone();
+				currentCell = Util.applyArcConsistency(currentCell, aNode, currentConstraints);
+				//System.out.println("current cell post "+currentCell.toString());
 				for(Integer value : currentCell.getDomain()) {
-					TreeNode newNode = new TreeNode(aNode.getBoard(), value, currentCell);
-					if(newNode.canBearChildren()) {
+					TreeNode newNode = new TreeNode(i, value, currentCell);
+					newNode.setParent(aNode);
+					if(newNode.canBearChildren(currentConstraints)) {
 						// Only add node if it can bear children
 						aNode.addChild(newNode);
 						nextLevel.add(newNode);
+						System.out.println("New node: "+newNode.toStringA());
 					}
+
 				}
 				currentLevel.remove(j);
-				aNode.deleteBoard();
+				//aNode.deleteBoard();
 			}
-
+			System.out.println("level #:\t" + i + "\tNumber of nodes on level\t" + nextLevel.size() + ": " + nextLevel.toString());
 			// Update current level to next level
 			for (int j = 0; j < nextLevel.size(); j++) {
 				TreeNode aNode = nextLevel.get(j);
 				currentLevel.add(aNode);
 				nextLevel.remove(j);
 			}
-			System.out.println("level #:\t" + i + "\tNumber of nodes on level\t" + nextLevel.size() + ": " + nextLevel.toString());
-
+			//currentLevel.addAll(nextLevel);
+			//nextLevel.clear();
 		}
 	}
 

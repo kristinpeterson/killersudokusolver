@@ -123,6 +123,18 @@ public class Board {
     }
 
     /**
+     * Returns list of all constraints on this board
+     *
+     */
+    public ArrayList<Constraint> getConstraintsClone() {
+        ArrayList<Constraint> clone = new ArrayList<Constraint>();
+        for (Constraint c: constraints ) {
+            clone.add(c);
+        }
+        return clone;
+    }
+
+    /**
      * Sets list of all constraints on this board
      *
      */

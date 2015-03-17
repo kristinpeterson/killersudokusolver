@@ -33,6 +33,14 @@ public class Cell{
 		constraints = new ArrayList<Constraint>();
 	}
 
+	public Cell clone(){
+		Cell copy = new Cell(x,y);
+		copy.domain = getDomain();
+		copy.value = value;
+		copy.constraints = getConstraints();
+		return copy;
+	}
+
 	public int getX(){
 		return x;
 	}
