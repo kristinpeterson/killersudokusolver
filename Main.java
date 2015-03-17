@@ -71,7 +71,7 @@ public class Main {
 		List<TreeNode> nextLevel = new ArrayList<TreeNode>();
 		currentLevel.add(root);
 		// Create new level for each cell in the board
-		for(int i = 0; i < 5; i++){//board.getCells().size() - 1; i++) {
+		for(int i = 0; i < 2; i++){//board.getCells().size() - 1; i++) {
 			Cell currentCell = board.getCells().get(i);
 
 			// Iterate through nodes in current level and:
@@ -79,14 +79,15 @@ public class Main {
 			// + add child nodes of currentLevel to nextLevel
 			for(int j = currentLevel.size() - 1; j >= 0; j--) {
 				TreeNode aNode = currentLevel.get(j);
+				System.out.println("anode " + aNode);
 				//System.out.println("current cell pre "+currentCell.toString());
-				ArrayList<Constraint> currentConstraints = board.getConstraintsClone();
+				ArrayList<Constraint> currentConstraints = board.getConstraintsDeepCopy();
 				currentCell = Util.applyArcConsistency(currentCell, aNode, currentConstraints);
 				//System.out.println("current cell post "+currentCell.toString());
 				for(Integer value : currentCell.getDomain()) {
 					TreeNode newNode = new TreeNode(i, value, currentCell);
 					newNode.setParent(aNode);
-					if(newNode.canBearChildren(currentConstraints)) {
+					if(newNode.canBearChildren(board.getConstraintsDeepCopy())) {
 						// Only add node if it can bear children
 						aNode.addChild(newNode);
 						nextLevel.add(newNode);

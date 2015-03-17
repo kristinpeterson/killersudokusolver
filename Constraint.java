@@ -27,6 +27,15 @@ public class Constraint {
         preSize = satisfyingAssignments.size();
     }
 
+    public Constraint clone(){
+        Cell[] copyCells = new Cell[variables.length];
+        for(int i=0; i< copyCells.length; i++){
+            copyCells[i] = variables[i].clone();
+        }
+        return new Constraint(this.getName(), copyCells, this.getSatisfyingAssignmentsClone());
+        
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -53,6 +62,14 @@ public class Constraint {
 
     public ArrayList<ArrayList<Integer>> getSatisfyingAssignments() {
         return satisfyingAssignments;
+    }
+
+    public ArrayList<ArrayList<Integer>> getSatisfyingAssignmentsClone() {
+        ArrayList<ArrayList<Integer>> satisfyingAssignmentsClone = new ArrayList<ArrayList<Integer>>();
+        for(ArrayList<Integer> assignment : satisfyingAssignments) {
+            satisfyingAssignmentsClone.add(assignment);
+        }
+        return satisfyingAssignmentsClone;
     }
 
     public void removeAssignment(int cell, int val){

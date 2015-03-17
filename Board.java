@@ -134,6 +134,18 @@ public class Board {
         return clone;
     }
 
+        /**
+     * Returns list of all constraints on this board
+     *
+     */
+    public ArrayList<Constraint> getConstraintsDeepCopy() {
+        ArrayList<Constraint> clone = new ArrayList<Constraint>();
+        for (Constraint c: constraints ) {
+            clone.add(c.clone());
+        }
+        return clone;
+    }
+
     /**
      * Sets list of all constraints on this board
      *

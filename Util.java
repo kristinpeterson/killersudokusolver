@@ -205,6 +205,7 @@ public class Util {
                         //pull the arraylist of nonessential values from the hash table
                         ArrayList<Integer> temp = nonessential.get(s);
                         //loop through the array list and remove each nonessential from the constraint and cell
+                        //System.out.println(cells[j].toString() + " removing " +temp);
                         for(Integer assignment: temp){
                             c.removeAssignment(j, assignment);
                             cells[j].removeAssignment(assignment);
