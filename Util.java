@@ -125,6 +125,7 @@ public class Util {
     }
 
     private static Hashtable<String, ArrayList<Integer>> buildNEfromConstraints(Hashtable<String, ArrayList<Integer>> nonessential, ArrayList<Constraint> constraints) {
+        //set booleans so default is that value is essential
         boolean one=false,two=false,three=false,four=false,five=false,six=false,seven=false,eight=false,nine =false;
         for (Constraint c : constraints) {
             ArrayList<ArrayList<Integer>> cSat = c.getSatisfyingAssignments();
@@ -181,6 +182,8 @@ public class Util {
                     nine=false;
                 }
             }
+            //reset booleans so default is that value is essential
+            one=false;two=false;three=false;four=false;five=false;six=false;seven=false;eight=false;nine =false;
         }
         return nonessential;
     }
