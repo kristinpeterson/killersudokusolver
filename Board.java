@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Stack;
 
@@ -21,10 +20,9 @@ public class Board {
     public static final int SIZE = 9;
     public static final int NONET_SIZE = 9;
 
-    private ArrayList<Cage> cages;
-    private ArrayList<Cell> cells;
-    private ArrayList<Constraint> constraints;
-    private Hashtable<String, ArrayList<Integer>> nonessential = new Hashtable<String, ArrayList<Integer>>();
+    private List<Cage> cages;
+    private List<Cell> cells;
+    private List<Constraint> constraints;
 
     public Board(){
         cages = new ArrayList<Cage>();
@@ -36,26 +34,26 @@ public class Board {
         cages.add(c);
     }
 
-    public ArrayList<Cage> getCages(){
+    public List<Cage> getCages(){
         return cages;
     }
 
-    public ArrayList<Cell> getCells() {
+    public List<Cell> getCells() {
         return cells;
     }
 
     public void orderCellsAscending(){
-        ArrayList<Cell> orderedCells = new ArrayList<Cell>();
-        ArrayList<Cell> zero = new ArrayList<Cell>();
-        ArrayList<Cell> one = new ArrayList<Cell>();
-        ArrayList<Cell> two = new ArrayList<Cell>();
-        ArrayList<Cell> three = new ArrayList<Cell>();
-        ArrayList<Cell> four = new ArrayList<Cell>();
-        ArrayList<Cell> five = new ArrayList<Cell>();
-        ArrayList<Cell> six = new ArrayList<Cell>();
-        ArrayList<Cell> seven = new ArrayList<Cell>();
-        ArrayList<Cell> eight = new ArrayList<Cell>();
-        ArrayList<Cell> nine = new ArrayList<Cell>();
+        List<Cell> orderedCells = new ArrayList<Cell>();
+        List<Cell> zero = new ArrayList<Cell>();
+        List<Cell> one = new ArrayList<Cell>();
+        List<Cell> two = new ArrayList<Cell>();
+        List<Cell> three = new ArrayList<Cell>();
+        List<Cell> four = new ArrayList<Cell>();
+        List<Cell> five = new ArrayList<Cell>();
+        List<Cell> six = new ArrayList<Cell>();
+        List<Cell> seven = new ArrayList<Cell>();
+        List<Cell> eight = new ArrayList<Cell>();
+        List<Cell> nine = new ArrayList<Cell>();
         for(Cell c : cells) {
             switch(c.getDomain().size()) {
                 case 0: zero.add(c); break;
@@ -118,23 +116,12 @@ public class Board {
      * Returns list of all constraints on this board
      *
      */
-    public ArrayList<Constraint> getConstraints() {
+    public List<Constraint> getConstraints() {
         return constraints;
     }
 
-    /**
-     * Returns list of all constraints on this board
-     *
-     */
-    public ArrayList<Constraint> getConstraintsClone() {
-        ArrayList<Constraint> clone = new ArrayList<Constraint>();
-        for (Constraint c: constraints ) {
-            clone.add(c);
-        }
-        return clone;
-    }
 
-        /**
+    /**
      * Returns list of all constraints on this board
      *
      */
@@ -177,10 +164,6 @@ public class Board {
             }
         }
         return cells;
-    }
-
-    public Hashtable<String, ArrayList<Integer>> getNonessential() {
-        return nonessential;
     }
 
     public Board copy() {

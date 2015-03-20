@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * Various utility methods
@@ -18,7 +19,7 @@ public class Util {
      *
      * @throws Exception
      */
-    /*public static void printM1Output() {
+    public static void printM1Output() {
         try {
             File of = new File("m1output.txt");
             BufferedWriter output = new BufferedWriter(new FileWriter(of));
@@ -58,55 +59,19 @@ public class Util {
 
             // Clear Board.cages from memory, no longer needed
             Main.board.getCages().clear();
-
-            // Add list of constraints to each cell
-            for(Constraint constraint : Main.board.getConstraints()) {
-                for(Cell cell : constraint.getVariables()) {
-                    Main.board.getCell(cell.getX(), cell.getY()).addConstraint(constraint);
-                }
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }*/
+    }
 
     public static void applyArcConsistency(Board board){
         Hashtable<String, ArrayList<Integer>> nonessential = buildNEfromCageConstraint(new Hashtable<String, ArrayList<Integer>>(), board.getConstraints());
         reduceFromNE(nonessential, board.getConstraints());
-        nonessential = buildNEfromConstraints(nonessential, board.getConstraints());
-        reduceFromNE(nonessential, board.getConstraints());
     }
 
-    public static ArrayList<Constraint> applyArcConsistency(TreeNode tree, ArrayList<Constraint> constraints){
-        Hashtable<String, ArrayList<Integer>> nonessential = new Hashtable<String, ArrayList<Integer>>();
-        for (Cell c: tree.traverseUp()) {
-            for(int i=0; i<9; i++){
-                if(c.getValue() != Board.POSSIBLE_VALUES[i]){
-                    String constraintName = "cell_" + c.getY() + "_"+c.getX();
-                    addNonEssential(nonessential, constraintName, Board.POSSIBLE_VALUES[i]);
-                } 
-                
-           }
-        }
-        constraints = reduceFromNE(nonessential, constraints);
-        //nonessential = buildNEfromConstraints(nonessential, constraints);
-        //constraints = reduceFromNE(nonessential, constraints);
-        return constraints;
-    }
-
-    public static Cell applyArcConsistency(Cell nextCell, TreeNode tree, ArrayList<Constraint> constraints){
-        constraints = applyArcConsistency(tree, constraints);
-        for (Constraint c: constraints) {
-            for(Cell cell : c.getVariables()){
-                if(cell.equals(nextCell)){
-                    return cell.clone();
-                }
-           }
-        }
-        return nextCell;
-    }
-
-    private static Hashtable<String, ArrayList<Integer>> buildNEfromCageConstraint(Hashtable<String, ArrayList<Integer>> nonessential, ArrayList<Constraint> constraints) {
+    // Build a list of nonesential values from the cage constraints
+    // This is used during the initial arc consistency performed on the Main.board
+    private static Hashtable<String, ArrayList<Integer>> buildNEfromCageConstraint(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
         for (Constraint c : constraints) {
             if (!c.getName().startsWith("C")) {
                 for (Cell cell : c.getVariables()) {
@@ -124,77 +89,12 @@ public class Util {
         return nonessential;
     }
 
-    private static Hashtable<String, ArrayList<Integer>> buildNEfromConstraints(Hashtable<String, ArrayList<Integer>> nonessential, ArrayList<Constraint> constraints) {
-        //set booleans so default is that value is essential
-        boolean one=false,two=false,three=false,four=false,five=false,six=false,seven=false,eight=false,nine =false;
-        for (Constraint c : constraints) {
-            ArrayList<ArrayList<Integer>> cSat = c.getSatisfyingAssignments();
-            Cell[] cells = c.getVariables();
-            for (int i=0; i < cells.length; i++) {
-                for(ArrayList<Integer> foo: cSat){
-                    switch(foo.get(i)){
-                        case 1: one=true;
-                        case 2: two=true;
-                        case 3: three=true;
-                        case 4: four=true;
-                        case 5: five=true;
-                        case 6: six=true;
-                        case 7: seven=true;
-                        case 8: eight=true;
-                        case 9: nine=true;
-                    }
-                }
-                String prefix = "cell_" + cells[i].getY() + "_" + cells[i].getX();
-                if(!one){
-                    addNonEssential(nonessential, prefix, 1);
-                    one=false;
-                }
-                if(!two){
-                    addNonEssential(nonessential, prefix, 2);
-                    two=false;
-                }
-                if(!three){
-                    addNonEssential(nonessential, prefix, 3);
-                    one=false;
-                }
-                if(!four){
-                    addNonEssential(nonessential, prefix, 4);
-                    four=false;
-                }
-                if(!five){
-                    addNonEssential(nonessential, prefix, 5);
-                    five=false;
-                }
-                if(!six){
-                    addNonEssential(nonessential, prefix, 6);
-                    six=false;
-                }
-                if(!seven){
-                    addNonEssential(nonessential, prefix, 7);
-                    seven=false;
-                }
-                if(!eight){
-                    addNonEssential(nonessential, prefix, 8);
-                    eight=false;
-                }
-                if(!nine){
-                    addNonEssential(nonessential, prefix, 9);
-                    nine=false;
-                }
-            }
-            //reset booleans so default is that value is essential
-            one=false;two=false;three=false;four=false;five=false;six=false;seven=false;eight=false;nine =false;
-        }
-        return nonessential;
-    }
-
-    
     /**
      * Goes through the nonessential list and removes non-essential assignments
-     * from rowConstraints
+     * from constraints
      *
      */
-    private static ArrayList<Constraint> reduceFromNE(Hashtable<String, ArrayList<Integer>> nonessential, ArrayList<Constraint> constraints) {
+    public static ArrayList<Constraint> reduceFromNE(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
         ArrayList<String> keySet = new ArrayList<String>();
         for(String s: nonessential.keySet()) {
             // info[1] is y
@@ -206,9 +106,8 @@ public class Util {
                     //if you've found the right cell
                     if (cells[j].getY() == Integer.parseInt(info[1]) && cells[j].getX() == Integer.parseInt(info[2])){
                         //pull the arraylist of nonessential values from the hash table
-                        ArrayList<Integer> temp = nonessential.get(s);
+                        List<Integer> temp = nonessential.get(s);
                         //loop through the array list and remove each nonessential from the constraint and cell
-                        //System.out.println(cells[j].toString() + " removing " +temp);
                         for(Integer assignment: temp){
                             c.removeAssignment(j, assignment);
                             cells[j].removeAssignment(assignment);
@@ -221,10 +120,10 @@ public class Util {
         for (String key: keySet){
             nonessential.remove(key);
         }
-        return constraints;
+        return new ArrayList<Constraint>(constraints);
     }
 
-    private static void addNonEssential(Hashtable<String, ArrayList<Integer>> nonessential, String ne, int val){
+    public static void addNonEssential(Hashtable<String, ArrayList<Integer>> nonessential, String ne, int val){
         ArrayList<Integer> temp = new ArrayList<Integer>();
         if(nonessential.containsKey(ne)){
             temp = nonessential.get(ne);
@@ -232,57 +131,4 @@ public class Util {
         temp.add(new Integer(val));
         nonessential.put(ne, temp);
     }
-
-    public static ArrayList<Constraint> sortConstraintBySize(ArrayList<Constraint> ac) {
-        ArrayList<Constraint> sorted = new ArrayList<Constraint>();
-        //Base cases as this method is recursive
-        if(ac.size()<=1){
-            return ac;
-        } else if (ac.size() == 2){
-            if(ac.get(0).getSatisfyingAssignments().size() < ac.get(1).getSatisfyingAssignments().size())
-                return ac;
-            else{
-                sorted.add(ac.get(1));
-                sorted.add(ac.get(0));
-                return sorted;
-            }
-        }
-        ArrayList<Constraint> smaller = new ArrayList<Constraint>();
-        ArrayList<Constraint> bigger = new ArrayList<Constraint>();
-        ArrayList<Constraint> equal = new ArrayList<Constraint>();
-        int pindex = ac.size()/2;
-        int pivot = ac.get(pindex).getSatisfyingAssignments().size(); //size of middle element as pivot
-        for (int h = 0; h < ac.size(); h++) {
-            if (h!=pindex){
-                if(ac.get(h).getSatisfyingAssignments().size() > pivot)
-                    bigger.add(ac.get(h));
-                if(ac.get(h).getSatisfyingAssignments().size() < pivot)
-                    smaller.add(ac.get(h));
-                if(ac.get(h).getSatisfyingAssignments().size() == pivot)
-                    equal.add(ac.get(h));
-            }
-        }
-        smaller = sortConstraintBySize(smaller);
-        smaller.addAll(equal);
-        bigger = sortConstraintBySize(bigger);
-        smaller.addAll(bigger);
-        return smaller;
-    }
-
-    public static Cell[] concatArray(Cell[] first, Cell[] second){
-        Cell[] combo = new Cell[first.length + second.length];
-        int combo_index=0;
-        int i=0;
-        while(i<first.length){
-            combo[combo_index] = first[i];
-            i++; combo_index++;
-        }
-        i=0;
-        while(i<second.length){
-            combo[combo_index] = second[i];
-            i++; combo_index++;
-        }
-        return combo;
-    }
-
 }

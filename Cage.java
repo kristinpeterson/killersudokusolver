@@ -20,7 +20,7 @@ import java.util.Stack;
 public class Cage {
 
 	private int goal;
-	private ArrayList<Cell> cells;
+	private List<Cell> cells;
 	private String cageId;
 	private List<Stack<Integer>> permutatedSolutions;
 
@@ -60,7 +60,7 @@ public class Cage {
 		return cells.size();
 	}
 
-	public ArrayList<Cell> getCells() {
+	public List<Cell> getCells() {
 		return cells;
 	}
 

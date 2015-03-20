@@ -16,28 +16,29 @@ public class Cell{
 	private int x;
 	private int y;
 	private int value;
+	private ArrayList<Integer> nonessential;
 	private ArrayList<Integer> domain;
-	private ArrayList<Constraint> constraints; // constraints associated w/ this cell
 
 	public Cell(int x, int y){
 		this.x = x;
 		this.y = y;
 		domain = new ArrayList<Integer>();
-		constraints = new ArrayList<Constraint>();
+		nonessential = new ArrayList<Integer>();
+		value = -1;	// set to -1 as a flag that value hasn't been set
 	}
 
 	public Cell(String xs, String ys){
 		x = Integer.parseInt(xs);
 		y = Integer.parseInt(ys);
 		domain = new ArrayList<Integer>();
-		constraints = new ArrayList<Constraint>();
+		nonessential = new ArrayList<Integer>();
+		value = -1;	// set to -1 as a flag that value hasn't been set
 	}
 
 	public Cell clone(){
-		Cell copy = new Cell(x,y);
+		Cell copy = new Cell(x, y);
 		copy.domain = getDomain();
 		copy.value = value;
-		copy.constraints = getConstraints();
 		return copy;
 	}
 
@@ -49,22 +50,20 @@ public class Cell{
 		return y;
 	}
 
-	public void addConstraint(Constraint constraint) {
-		constraints.add(constraint);
-	}
-
-	public ArrayList<Constraint> getConstraints() {
-		ArrayList<Constraint> clone = new ArrayList<Constraint>();
-		for(Constraint c : constraints) {
-			clone.add(c);
-		}
-		return clone;
-	}
-
+	/**
+	 * Sets the cells value, updates domain to equal just the value,
+	 * and compiles nonesential values (ie all values not equal to value being set)
+	 *
+	 * @param num the value to set cell to
+	 */
 	public void setValue(Integer num){
 		value = num.intValue();
-		domain.clear();
-		addDomainValue(num);
+		for(int i = domain.size() - 1; i >= 0; i--) {
+			if(domain.get(i) != value) {
+				nonessential.add(domain.get(i));
+				domain.remove(i);
+			}
+		}
 	}
 
 	public int getValue() {
@@ -99,6 +98,10 @@ public class Cell{
 			solutionsClone.add(i);
 		}
 		return solutionsClone;
+	}
+
+	public ArrayList<Integer> getNonessential() {
+		return nonessential;
 	}
 
 	/** Return which nonet this cell would be in
@@ -137,7 +140,7 @@ public class Cell{
 	}
 
 	public String toString() {
-		return "x: " + x + " y: " + y + " domain: " + getDomain() + "\n";
+		return "x: " + x + " y: " + y + " domain: " + getDomain();
 	}
 
 }

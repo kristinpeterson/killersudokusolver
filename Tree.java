@@ -173,22 +173,14 @@ public class Tree {
         for(TreeNode child : node.getChildren()) {
             buildPostOrderWithDepth(child, traversalResult, depth + 1);
         }
-
         traversalResult.put(node, depth);
     }
 
     public String toString() {
-        /*
-        We're going to assume a pre-order traversal by default
-         */
-
         String stringRepresentation = "";
-
         if(root != null) {
             stringRepresentation = build(TreeTraversalOrderEnum.PRE_ORDER).toString();
-
         }
-
         return stringRepresentation;
     }
 
@@ -201,51 +193,4 @@ public class Tree {
 
         return stringRepresentation;
     }
-
-    /*public boolean canBearChild(){
-        for (Constraint c : Main.board.getConstraints()) {
-            if(c.getDomain().size() == 0)
-                return false; // there is a constraint that has no satisfying assignments
-        }
-        return true;
-    }
-
-    public ArrayList<Tree> createChildren(){
-        ArrayList<Tree> newLevel = new ArrayList<Tree>();
-        Cell c = getNextLevel();
-        if(c != null) {
-            c = Main.board.getCell(c.getX(), c.getY());
-            ArrayList<Constraint> conClone = new ArrayList<Constraint>();
-            for (Constraint con : Main.board.getConstraints()) {
-                conClone.add(con);
-            }
-            for (Integer i : c.getSolutions()) {
-                Cell next = new Cell(c.getX(), c.getY());
-                next.setValue(i);
-                Main.board.addCell(next);
-                newLevel.add(new Tree(Main.board, next, depth + 1, this, conClone));
-            }
-            return newLevel;
-        } else {
-            return null;
-        }
-    }
-
-    private Cell getNextLevel(){
-        for (Constraint c: Main.board.getConstraints()) {
-            if(c.getDomain().size() > 1){
-                for (Cell cell : c.getVariables()){
-                    if (cell.getSolutions().size() > 1) {
-                        return cell;
-                    }
-                }
-            }
-        }
-        int i = 0;
-        for(Constraint c : Main.board.getConstraints()) {
-            System.out.println(i + ": " + c.getDomain());
-            i++;
-        }
-        return null;
-    }*/
 }
