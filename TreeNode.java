@@ -8,15 +8,17 @@ public class TreeNode{
 	private List<TreeNode> children;
 	private Cell cell = null;
 	private Integer value = null;
+	private int depth = 0;
 
 	public TreeNode(){
 		children = new ArrayList<TreeNode>();
 	}
 
-	public TreeNode(Integer value, Cell associatedCell){
+	public TreeNode(int d, Integer value, Cell associatedCell){
 		children = new ArrayList<TreeNode>();
 		setCell(associatedCell.clone());
 		setValue(value);
+		depth = d;
 	}
 
 	public TreeNode getParent() {
@@ -25,6 +27,10 @@ public class TreeNode{
 
 	public void setParent(TreeNode p) {
 		this.parent =p;
+	}
+
+	public int getDepth() {
+		return depth;
 	}
 
 	public List<TreeNode> getChildren() {
@@ -117,16 +123,17 @@ public class TreeNode{
 
 		// Apply arc consistency like a baus
 		constraints = Util.reduceFromNE(nonessential, constraints);
+		Util.applyArcConsistency(constraints);
 
 		// Iterate over this branch's constraints and if any result in an
 		// empty satisfying assignment list this node cannot bear children
 		// otherwise, congratulations you're having a baby node!
 		for(Constraint c : constraints) {
 			if(c.getSatisfyingAssignments().size() == 0) {
-				canBearChildren = false;
+				return false;
 			}
 		}
-
+		
 		return canBearChildren;
 	}
 }

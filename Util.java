@@ -69,11 +69,16 @@ public class Util {
         reduceFromNE(nonessential, board.getConstraints());
     }
 
+    public static void applyArcConsistency( List<Constraint> constraints){
+        Hashtable<String, ArrayList<Integer>> nonessential = buildNEfromCageConstraint(new Hashtable<String, ArrayList<Integer>>(), constraints);
+        reduceFromNE(nonessential, constraints);
+    }
+
     // Build a list of nonesential values from the cage constraints
     // This is used during the initial arc consistency performed on the Main.board
     private static Hashtable<String, ArrayList<Integer>> buildNEfromCageConstraint(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
         for (Constraint c : constraints) {
-            if (!c.getName().startsWith("C")) {
+            //if (!c.getName().startsWith("C")) {
                 for (Cell cell : c.getVariables()) {
                     ArrayList<Integer> sa = cell.getDomain();
                     if (sa.size() < 9) {
@@ -84,7 +89,7 @@ public class Util {
                         }
                     }
                 }
-            }
+            //}
         }
         return nonessential;
     }

@@ -71,20 +71,21 @@ public class Main {
 		List<TreeNode> nextLevel = new ArrayList<TreeNode>();
 		currentLevel.add(root);
 		// Create new level for each cell in the board
-		for(int i = 0; i < board.getCells().size(); i++){//board.getCells().size() - 1; i++) {
+
+		for(int i = 0; i < 15; i++){//board.getCells().size() - 1; i++) {
 			Cell currentCell = board.getCells().get(i);
 
 			// Iterate through nodes in current level and add children
 			for(int j = currentLevel.size() - 1; j >= 0; j--) {
 				TreeNode aNode = currentLevel.get(j);
 				for(Integer value : currentCell.getDomain()) {
-					TreeNode newNode = new TreeNode(value, currentCell);
+					TreeNode newNode = new TreeNode(i, value, currentCell);
 					newNode.setParent(aNode);
 					if(newNode.canBearChildren()) {
 						// Only add node if it can bear children
 						aNode.addChild(newNode);
 						nextLevel.add(newNode);
-					}
+					}  // add something here to mark dead end? or prune?
 				}
 				currentLevel.remove(j);
 			}
@@ -165,7 +166,7 @@ public class Main {
 			for(int r = 1; r < 9; r++) {
 				for(int i = r; i < 9; i++) {
 					if (r != i) {
-						String constraintName = nonetName + cells[r].getY() + cells[r].getX() + "x" + cells[i].getY() + cells[i].getX();
+						String constraintName = nonetName + cells[r].getX() + cells[r].getY() + "x" + cells[i].getX() + cells[i].getY();
 						Cell[] variables = {cells[r], cells[i]};
 						Constraint constraint = new Constraint(constraintName, variables, rcInitSatisfyingAssignments);
 						nonetConstraints.add(constraint);

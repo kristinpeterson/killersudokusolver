@@ -42,21 +42,40 @@ public class Board {
         return cells;
     }
 
+    public ArrayList<Cell> orderAdjacent(ArrayList<Cell> cells){
+        ArrayList<Cell> orderedCells = new ArrayList<Cell>();
+        for (int i=0; i<cells.size() ; i++) {
+            for (int j=0; j<cells.size(); j++) {
+                Cell a = cells.get(i);
+                Cell b = cells.get(j);
+                if (!orderedCells.contains(a)) { //if cell isn't in ordered array then add it
+                    orderedCells.add(a);
+                }
+                if (!a.equals(b)) { //if you aren't looking at the same cell
+                    if(a.getX() == b.getX() | a.getY() == b.getY()) // if a is adjacent to b
+                        if (!orderedCells.contains(b))
+                            orderedCells.add(b); // add it in order
+                }
+            }
+        }
+        return orderedCells;
+    }
+
     public void orderCellsAscending(){
-        List<Cell> orderedCells = new ArrayList<Cell>();
-        List<Cell> zero = new ArrayList<Cell>();
-        List<Cell> one = new ArrayList<Cell>();
-        List<Cell> two = new ArrayList<Cell>();
-        List<Cell> three = new ArrayList<Cell>();
-        List<Cell> four = new ArrayList<Cell>();
-        List<Cell> five = new ArrayList<Cell>();
-        List<Cell> six = new ArrayList<Cell>();
-        List<Cell> seven = new ArrayList<Cell>();
-        List<Cell> eight = new ArrayList<Cell>();
-        List<Cell> nine = new ArrayList<Cell>();
+        ArrayList<Cell> orderedCells = new ArrayList<Cell>();
+        ArrayList<Cell> zero = new ArrayList<Cell>();
+        ArrayList<Cell> one = new ArrayList<Cell>();
+        ArrayList<Cell> two = new ArrayList<Cell>();
+        ArrayList<Cell> three = new ArrayList<Cell>();
+        ArrayList<Cell> four = new ArrayList<Cell>();
+        ArrayList<Cell> five = new ArrayList<Cell>();
+        ArrayList<Cell> six = new ArrayList<Cell>();
+        ArrayList<Cell> seven = new ArrayList<Cell>();
+        ArrayList<Cell> eight = new ArrayList<Cell>();
+        ArrayList<Cell> nine = new ArrayList<Cell>();
         for(Cell c : cells) {
             switch(c.getDomain().size()) {
-                case 0: zero.add(c); break;
+                case 0: zero.add(c); break; // Shouldn't be any in here
                 case 1: one.add(c); break;
                 case 2: two.add(c); break;
                 case 3: three.add(c); break;
@@ -70,14 +89,14 @@ public class Board {
         }
         orderedCells.addAll(zero);
         orderedCells.addAll(one);
-        orderedCells.addAll(two);
-        orderedCells.addAll(three);
-        orderedCells.addAll(four);
-        orderedCells.addAll(five);
-        orderedCells.addAll(six);
-        orderedCells.addAll(seven);
-        orderedCells.addAll(eight);
-        orderedCells.addAll(nine);
+        orderedCells.addAll(orderAdjacent(two));
+        orderedCells.addAll(orderAdjacent(three));
+        orderedCells.addAll(orderAdjacent(four));
+        orderedCells.addAll(orderAdjacent(five));
+        orderedCells.addAll(orderAdjacent(six));
+        orderedCells.addAll(orderAdjacent(seven));
+        orderedCells.addAll(orderAdjacent(eight));
+        orderedCells.addAll(orderAdjacent(nine));
 
         cells.clear();
         for(Cell cell: orderedCells) {
