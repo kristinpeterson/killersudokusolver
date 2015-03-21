@@ -88,10 +88,14 @@ public class Cell{
 	public void addDomainValue(Integer i){
 		if(!domain.contains(i))
 			domain.add(i);
+		nonessential.remove(i);
 	}
 
 	public boolean removeAssignment(Integer i){
-		return domain.remove(i);
+		boolean removed = domain.remove(i); 
+		if(removed) // if successfully removed, add value to nonessential list
+			nonessential.add(i);
+		return removed;
 	}
 
 	public ArrayList<Integer> getDomain() {
