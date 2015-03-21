@@ -112,29 +112,6 @@ public class Constraint {
         }
     }
 
-    /**
-     * Checks if the given cell/value combination is a satisfying assignment
-     * for this constraint
-     *
-     * @param cell
-     * @param value
-     * @return true if the given cell/value
-     */
-    public boolean isSatisfyingAssignment(Cell cell, Integer value) {
-        int index = 0;
-        for(int i = 0; i < variables.length; i++) {
-            if(variables[i].equals(cell)) {
-                index = i;
-            }
-        }
-        for(ArrayList<Integer> satisfyingAssignment : satisfyingAssignments) {
-            if(satisfyingAssignment.get(index).equals(value)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public String toString(){
         StringBuilder sb = new StringBuilder();
         sb.append("Constraint "+name +"\n");

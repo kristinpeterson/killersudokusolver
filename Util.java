@@ -72,6 +72,12 @@ public class Util {
         }
     }
 
+    /**
+     * Applies arc consistency on the given list of constraints
+     *
+     * @param constraints list of constraints to enforce arc consistency
+     * @return true if after arc consistency enforced there are no constraints with empty satisfying assignment lists
+     */
     public static boolean applyArcConsistency(ArrayList<Constraint> constraints){
         Hashtable<String, ArrayList<Integer>> nonessential = buildNonessentials(new Hashtable<String, ArrayList<Integer>>(), constraints);
         return reduceFromNE(nonessential, constraints);
@@ -95,8 +101,6 @@ public class Util {
                         }
                     }
                 }
-
-                System.out.println(Main.fucker++);
             }
         }
         return nonessential;
