@@ -1,3 +1,5 @@
+package killersudokusolver;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -6,8 +8,14 @@ import java.util.Hashtable;
 import java.util.List;
 
 /**
+ * COURSE: CECS-551 AI
+ * PROFESSOR: Todd Ebert
+ * PROJECT: Killer Sudoku Solver
+ *
  * Various utility methods
  *
+ * @author Kristin Peterson
+ * @author Ariel Katz
  */
 public class Util {
 
@@ -64,32 +72,32 @@ public class Util {
         }
     }
 
-    public static void applyArcConsistency(Board board){
-        Hashtable<String, ArrayList<Integer>> nonessential = buildNEfromCageConstraint(new Hashtable<String, ArrayList<Integer>>(), board.getConstraints());
-        reduceFromNE(nonessential, board.getConstraints());
+    public static boolean applyArcConsistency(ArrayList<Constraint> constraints){
+        Hashtable<String, ArrayList<Integer>> nonessential = buildNonessentials(new Hashtable<String, ArrayList<Integer>>(), constraints);
+        return reduceFromNE(nonessential, constraints);
     }
 
-    public static void applyArcConsistency( List<Constraint> constraints){
-        Hashtable<String, ArrayList<Integer>> nonessential = buildNEfromCageConstraint(new Hashtable<String, ArrayList<Integer>>(), constraints);
-        reduceFromNE(nonessential, constraints);
-    }
-
-    // Build a list of nonesential values from the cage constraints
-    // This is used during the initial arc consistency performed on the Main.board
-    private static Hashtable<String, ArrayList<Integer>> buildNEfromCageConstraint(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
+    /**
+     * Build list of nonessential values based on constraints
+     *
+     * @param nonessential the nonessential list to build
+     * @param constraints constraints to build nonessentials off of
+     * @return the nonessential list
+     */
+    private static Hashtable<String, ArrayList<Integer>> buildNonessentials(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
         for (Constraint c : constraints) {
-            //if (!c.getName().startsWith("C")) {
-                for (Cell cell : c.getVariables()) {
-                    ArrayList<Integer> sa = cell.getDomain();
-                    if (sa.size() < 9) {
-                        for (int n = 1; n < 10; n++) {
-                            if (!sa.contains(new Integer(n))) {
-                                addNonEssential(nonessential, "cell_" + cell.getY() + "_" + cell.getX(), n);
-                            }
+            for (Cell cell : c.getVariables()) {
+                ArrayList<Integer> domain = cell.getDomain();
+                if (domain.size() < 9) {
+                    for (int n = 1; n < 10; n++) {
+                        if (!domain.contains(n)) {
+                            addNonEssential(nonessential, "cell_" + cell.getY() + "_" + cell.getX(), n);
                         }
                     }
                 }
-            //}
+
+                System.out.println(Main.fucker++);
+            }
         }
         return nonessential;
     }
@@ -98,9 +106,11 @@ public class Util {
      * Goes through the nonessential list and removes non-essential assignments
      * from constraints
      *
+     * @return false if any of the constraints satisfying assignment lists are reduced to zero
      */
-    public static ArrayList<Constraint> reduceFromNE(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
+    public static boolean reduceFromNE(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
         ArrayList<String> keySet = new ArrayList<String>();
+        int i = 0;
         for(String s: nonessential.keySet()) {
             // info[1] is y
             // info[2] is x
@@ -119,21 +129,39 @@ public class Util {
                         }
                     }
                 }
+                if(c.getSatisfyingAssignments().size() == 0) {
+                    return false;
+                }
             }
             keySet.add(s);
         }
         for (String key: keySet){
             nonessential.remove(key);
         }
-        return new ArrayList<Constraint>(constraints);
+        return true;
     }
 
+    /**
+     * Add nonessential value to the given nonessential list
+     *
+     * @param nonessential the nonessential list being added to
+     * @param ne a string representation of the nonessential value's associated cell used as a key for the
+     *           nonessential list hash
+     * @param val the nonessential value to add
+     */
     public static void addNonEssential(Hashtable<String, ArrayList<Integer>> nonessential, String ne, int val){
         ArrayList<Integer> temp = new ArrayList<Integer>();
+
+        // If nonessential list already has a value for the given ne key string
         if(nonessential.containsKey(ne)){
+            // Save the nonessential list of values for the given key to temp
             temp = nonessential.get(ne);
         }
-        temp.add(new Integer(val));
+
+        // Assign value to temp list
+        temp.add(val);
+
+        // Put the temp list into the nonessential values list
         nonessential.put(ne, temp);
     }
 }

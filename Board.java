@@ -1,3 +1,5 @@
+package killersudokusolver;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -20,9 +22,9 @@ public class Board {
     public static final int SIZE = 9;
     public static final int NONET_SIZE = 9;
 
-    private List<Cage> cages;
-    private List<Cell> cells;
-    private List<Constraint> constraints;
+    private ArrayList<Cage> cages;
+    private ArrayList<Cell> cells;
+    private ArrayList<Constraint> constraints;
 
     public Board(){
         cages = new ArrayList<Cage>();
@@ -34,36 +36,16 @@ public class Board {
         cages.add(c);
     }
 
-    public List<Cage> getCages(){
+    public ArrayList<Cage> getCages(){
         return cages;
     }
 
-    public List<Cell> getCells() {
+    public ArrayList<Cell> getCells() {
         return cells;
-    }
-
-    public ArrayList<Cell> orderAdjacent(ArrayList<Cell> cells){
-        ArrayList<Cell> orderedCells = new ArrayList<Cell>();
-        for (int i=0; i<cells.size() ; i++) {
-            for (int j=0; j<cells.size(); j++) {
-                Cell a = cells.get(i);
-                Cell b = cells.get(j);
-                if (!orderedCells.contains(a)) { //if cell isn't in ordered array then add it
-                    orderedCells.add(a);
-                }
-                if (!a.equals(b)) { //if you aren't looking at the same cell
-                    if(a.getX() == b.getX() | a.getY() == b.getY()) // if a is adjacent to b
-                        if (!orderedCells.contains(b))
-                            orderedCells.add(b); // add it in order
-                }
-            }
-        }
-        return orderedCells;
     }
 
     public void orderCellsAscending(){
         ArrayList<Cell> orderedCells = new ArrayList<Cell>();
-        ArrayList<Cell> zero = new ArrayList<Cell>();
         ArrayList<Cell> one = new ArrayList<Cell>();
         ArrayList<Cell> two = new ArrayList<Cell>();
         ArrayList<Cell> three = new ArrayList<Cell>();
@@ -75,7 +57,6 @@ public class Board {
         ArrayList<Cell> nine = new ArrayList<Cell>();
         for(Cell c : cells) {
             switch(c.getDomain().size()) {
-                case 0: zero.add(c); break; // Shouldn't be any in here
                 case 1: one.add(c); break;
                 case 2: two.add(c); break;
                 case 3: three.add(c); break;
@@ -87,16 +68,15 @@ public class Board {
                 case 9: nine.add(c); break;
             }
         }
-        orderedCells.addAll(zero);
         orderedCells.addAll(one);
-        orderedCells.addAll(orderAdjacent(two));
-        orderedCells.addAll(orderAdjacent(three));
-        orderedCells.addAll(orderAdjacent(four));
-        orderedCells.addAll(orderAdjacent(five));
-        orderedCells.addAll(orderAdjacent(six));
-        orderedCells.addAll(orderAdjacent(seven));
-        orderedCells.addAll(orderAdjacent(eight));
-        orderedCells.addAll(orderAdjacent(nine));
+        orderedCells.addAll(two);
+        orderedCells.addAll(three);
+        orderedCells.addAll(four);
+        orderedCells.addAll(five);
+        orderedCells.addAll(six);
+        orderedCells.addAll(seven);
+        orderedCells.addAll(eight);
+        orderedCells.addAll(nine);
 
         cells.clear();
         for(Cell cell: orderedCells) {
@@ -135,7 +115,7 @@ public class Board {
      * Returns list of all constraints on this board
      *
      */
-    public List<Constraint> getConstraints() {
+    public ArrayList<Constraint> getConstraints() {
         return constraints;
     }
 

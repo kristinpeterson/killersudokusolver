@@ -1,3 +1,5 @@
+package killersudokusolver;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -37,25 +39,8 @@ public class TreeNode{
 		return this.children;
 	}
 
-	public void setChildren(List<TreeNode> children) {
-		this.children = children;
-	}
-
 	public void addChild(TreeNode child) {
 		children.add(child);
-	}
-
-	public void addChildAt(int index, TreeNode child) throws IndexOutOfBoundsException {
-		child.parent = this;
-		children.add(index, child);
-	}
-
-	public void removeChildren() {
-		this.children = new ArrayList<TreeNode>();
-	}
-
-	public void removeChildAt(int index) throws IndexOutOfBoundsException {
-		children.remove(index);
 	}
 
 	public TreeNode getChildAt(int index) throws IndexOutOfBoundsException {
@@ -108,7 +93,6 @@ public class TreeNode{
 		boolean canBearChildren = true;
 		TreeNode currentNode = this;
 
-
 		// Build list of nonessential values for this cell and all it's ancestors
 		// Traverses up from current node up to root,
 		// when currentNode.getCell() == null you're at the root
@@ -122,17 +106,8 @@ public class TreeNode{
 		}
 
 		// Apply arc consistency like a baus
-		constraints = Util.reduceFromNE(nonessential, constraints);
-		Util.applyArcConsistency(constraints);
-
-		// Iterate over this branch's constraints and if any result in an
-		// empty satisfying assignment list this node cannot bear children
-		// otherwise, congratulations you're having a baby node!
-		for(Constraint c : constraints) {
-			if(c.getSatisfyingAssignments().size() == 0) {
-				return false;
-			}
-		}
+		Util.reduceFromNE(nonessential, constraints);
+		canBearChildren = Util.applyArcConsistency(constraints);
 		
 		return canBearChildren;
 	}

@@ -1,24 +1,11 @@
+package killersudokusolver;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * COURSE: CECS-551 AI
- * PROFESSOR: Todd Ebert
- * PROJECT: Killer Sudoku Solver
- *
- * A tree structure used to search for a solution that
- * satisfies all the problem constraints.
- *
- * The tree enforces static variable ordering, forward-checking childbearing rule,
- * and uses the associatedCell approach for extending an assignment (i.e. generating
- * the children of a given node).
- *
- * @author Kristin Peterson
- * @author Ariel Katz
- *
- */
+
 public class Tree {
 
     enum TreeTraversalOrderEnum {

@@ -1,3 +1,5 @@
+package killersudokusolver;
+
 import java.util.ArrayList;
 
 /**
@@ -82,17 +84,28 @@ public class Constraint {
     }
 
     public void checkAssignments(){
-        for(int i=0; i< variables.length; i++){
-            // set markers to false so that any domain values that aren't found in a satisfying assignment
-            // will be deleted from the cells domain
+        // For every variable in this constraint
+        for(int i = 0; i < variables.length; i++){
+            /*
+                Set markers to false so that any domain values that aren't found in a satisfying assignment
+                will be deleted from the cells domain
+             */
             boolean [] markers = {true, false, false, false, false, false, false, false, false, false};
+
+            // For all of this Constraint's satisfying assignments
             for(ArrayList<Integer> sa: satisfyingAssignments){
+                // Get the domain value for the current variable/cell
                 Integer cellDomainValue = sa.get(i);
+                // And set marker for that value to true
                 markers[cellDomainValue.intValue()] = true; //for every value found in a satisfying assignment mark it as true
             }
-            for (int domainValue=1; domainValue<=9 ; domainValue++ ) {
-                if(!markers[domainValue]) // if there were no satisfying assignments found with this assignemnt
-                    variables[i].removeAssignment(domainValue); // remove it from the cell domain
+
+            // For each possible domain value
+            for (int domainValue = 1; domainValue <= 9; domainValue++) {
+                if(!markers[domainValue])
+                    // if there were no satisfying assignments found for this variable/cell
+                    // remove it from the cell domain
+                    variables[i].removeAssignment(domainValue);
                 else
                     markers[domainValue] = false; //reset marker to false for next loop
             }

@@ -1,3 +1,5 @@
+package killersudokusolver;
+
 import java.io.FileReader;
 import java.io.File;
 import java.io.BufferedReader;
@@ -57,7 +59,7 @@ public class Main {
 		// Build list of all problem constraints
 		buildConstraints();
 
-		Util.applyArcConsistency(board);
+		Util.applyArcConsistency(board.getConstraints());
 
 		// Print Milestone 1 output (before clearing categorized constraint lists)
 		Util.printM1Output();
@@ -72,10 +74,8 @@ public class Main {
 		currentLevel.add(root);
 		// Create new level for each cell in the board
 
-		for(int i = 0; i < 16; i++){//board.getCells().size() - 1; i++) {
+		for(int i = 0; i < board.getCells().size(); i++){//board.getCells().size() - 1; i++) {
 			Cell currentCell = board.getCells().get(i);
-			Integer allValue = new Integer(0);
-			boolean allEqual = true;
 			// Iterate through nodes in current level and add children
 			for(int j = currentLevel.size() - 1; j >= 0; j--) {
 				TreeNode aNode = currentLevel.get(j);
@@ -83,7 +83,6 @@ public class Main {
 					TreeNode newNode = new TreeNode(i, value, currentCell);
 					newNode.setParent(aNode);
 					if(newNode.canBearChildren()) {
-						allValue = newNode.getValue();
 						// Only add node if it can bear children
 						aNode.addChild(newNode);
 						nextLevel.add(newNode);
@@ -91,28 +90,13 @@ public class Main {
 				}
 				currentLevel.remove(j);
 			}
-			for (int j = nextLevel.size() - 1; j >= 0; j--) {
-				TreeNode aNode = nextLevel.get(j);
-				if(allValue != aNode.getValue())
-					allEqual = false;
-			}
-			if (allEqual) {
-				// There is only one solution for this cell
-				// Set value in master cell and apply arc consistency
-				// This way each further level won't have to repeat work removing same nonessentials repeatedly
-				currentCell.setValue(allValue);
-				Util.applyArcConsistency(board);
-				//Not really sure if this helps anything
-			}
 
-			System.out.println("cell: " + currentCell);
-			System.out.println("level #:\t" + i + "\tNumber of nodes on level\t" + nextLevel.size() + ": " + nextLevel.toString() + "\n");
+			System.out.println(tree.toStringWithDepth());
+			//System.out.println("cell: " + currentCell);
+			//System.out.println("level #:\t" + i + "\tNumber of nodes on level\t" + nextLevel.size() + ": " + nextLevel.toString() + "\n");
 			// Update current level to next level
-			for (int j = nextLevel.size() - 1; j >= 0; j--) {
-				TreeNode aNode = nextLevel.get(j);
-				currentLevel.add(aNode);
-				nextLevel.remove(j);
-			}
+			currentLevel.addAll(nextLevel);
+			nextLevel.clear();
 		}
 	}
 
