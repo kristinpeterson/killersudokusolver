@@ -1,4 +1,4 @@
-package killersudokusolver;
+//package killersudokusolver;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -78,7 +78,7 @@ public class Util {
      * @param constraints list of constraints to enforce arc consistency
      * @return true if after arc consistency enforced there are no constraints with empty satisfying assignment lists
      */
-    public static boolean applyArcConsistency(ArrayList<Constraint> constraints){
+    public static boolean applyArcConsistency(Hashtable<String,Constraint> constraints){
         Hashtable<String, ArrayList<Integer>> nonessential = buildNonessentials(new Hashtable<String, ArrayList<Integer>>(), constraints);
         return reduceFromNE(nonessential, constraints);
     }
@@ -90,8 +90,9 @@ public class Util {
      * @param constraints constraints to build nonessentials off of
      * @return the nonessential list
      */
-    private static Hashtable<String, ArrayList<Integer>> buildNonessentials(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
-        for (Constraint c : constraints) {
+    private static Hashtable<String, ArrayList<Integer>> buildNonessentials(Hashtable<String, ArrayList<Integer>> nonessential, Hashtable<String,Constraint> constraints) {
+        for(String s: constraints.keySet()) {
+            Constraint c = constraints.get(s);
             for (Cell cell : c.getVariables()) {
                 ArrayList<Integer> domain = cell.getDomain();
                 if (domain.size() < 9) {
@@ -112,14 +113,16 @@ public class Util {
      *
      * @return false if any of the constraints satisfying assignment lists are reduced to zero
      */
-    public static boolean reduceFromNE(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
+    public static boolean reduceFromNE(Hashtable<String, ArrayList<Integer>> nonessential, Hashtable<String,Constraint> constraints) {
         ArrayList<String> keySet = new ArrayList<String>();
         int i = 0;
         for(String s: nonessential.keySet()) {
             // info[1] is y
             // info[2] is x
             String[] info = s.split("_");
-            for (Constraint c : constraints) {
+
+            for (String cname : constraints.keySet()) {
+                Constraint c = constraints.get(cname);
                 Cell[] cells = c.getVariables();
                 for(int j = 0; j < cells.length; j++) {
                     //if you've found the right cell
@@ -131,6 +134,8 @@ public class Util {
                             c.removeAssignment(j, assignment);
                             cells[j].removeAssignment(assignment);
                         }
+                        if (temp.size() > 0)
+                            c.checkAssignments();
                     }
                 }
                 if(c.getSatisfyingAssignments().size() == 0) {

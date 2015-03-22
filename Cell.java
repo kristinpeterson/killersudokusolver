@@ -1,4 +1,4 @@
-package killersudokusolver;
+//package killersudokusolver;
 
 import java.util.ArrayList;
 
@@ -20,20 +20,28 @@ public class Cell{
 	private int value;
 	private ArrayList<Integer> nonessential;
 	private ArrayList<Integer> domain;
+	private ArrayList<String> constraintNames;
 
 	public Cell(int x, int y){
 		this.x = x;
 		this.y = y;
 		domain = new ArrayList<Integer>();
 		nonessential = new ArrayList<Integer>();
+		for(int i=1; i<=9; i++)
+			nonessential.add(new Integer(i));
+		constraintNames = new ArrayList<String>();
 		value = -1;	// set to -1 as a flag that value hasn't been set
 	}
 
 	public Cell(String xs, String ys){
 		x = Integer.parseInt(xs);
 		y = Integer.parseInt(ys);
+		new Cell(x, y);
 		domain = new ArrayList<Integer>();
 		nonessential = new ArrayList<Integer>();
+		for(int i=1; i<=9; i++)
+			nonessential.add(new Integer(i));
+		constraintNames = new ArrayList<String>();
 		value = -1;	// set to -1 as a flag that value hasn't been set
 	}
 
@@ -41,6 +49,8 @@ public class Cell{
 		Cell copy = new Cell(x, y);
 		copy.domain = getDomain();
 		copy.value = value;
+		copy.constraintNames = constraintNames;
+		copy.nonessential = nonessential;
 		return copy;
 	}
 
@@ -62,8 +72,7 @@ public class Cell{
 		value = num.intValue();
 		for(int i = domain.size() - 1; i >= 0; i--) {
 			if(domain.get(i) != value) {
-				nonessential.add(domain.get(i));
-				domain.remove(i);
+				removeAssignment(i);
 			}
 		}
 	}
@@ -80,9 +89,18 @@ public class Cell{
 		if(this.equals(c)){
 			this.value = c.value;
 			domain = c.getDomain();
-			return false;
+			nonessential = c.getNonessential();
+			return true;
 		}
 		return false;
+	}
+
+	public void addConstraint(String name){
+		constraintNames.add(name);
+	}
+
+	public ArrayList<String> getConstraintNames(){
+		return constraintNames;
 	}
 
 	public void addDomainValue(Integer i){
@@ -147,6 +165,9 @@ public class Cell{
 
 	public String toString() {
 		return "x: " + x + " y: " + y + " domain: " + getDomain();
+	}
+	public String toStringVerbose() {
+		return "Cell x: " + x + " y: " + y + " \ndomain: " + getDomain()+ " \nNE: " + getNonessential() + " \nConstraints: " + getConstraintNames();
 	}
 
 }

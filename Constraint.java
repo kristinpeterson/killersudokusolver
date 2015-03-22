@@ -1,4 +1,4 @@
-package killersudokusolver;
+//package killersudokusolver;
 
 import java.util.ArrayList;
 
@@ -26,6 +26,8 @@ public class Constraint {
         setVariables(variables);
         setSatisfyingAssignments(satisfyingAssignments);
         preSize = satisfyingAssignments.size();
+        for(Cell c: variables)
+            c.addConstraint(name);
     }
 
     public Constraint clone(){
@@ -34,7 +36,6 @@ public class Constraint {
             copyCells[i] = variables[i].clone();
         }
         return new Constraint(this.getName(), copyCells, this.getSatisfyingAssignmentsClone());
-        
     }
 
     public void setName(String name) {
@@ -80,7 +81,6 @@ public class Constraint {
                 satisfyingAssignments.remove(j);
             }
         }
-        checkAssignments();
     }
 
     public void checkAssignments(){

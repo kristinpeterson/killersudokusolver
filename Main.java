@@ -1,4 +1,4 @@
-package killersudokusolver;
+//package killersudokusolver;
 
 import java.io.FileReader;
 import java.io.File;
@@ -74,8 +74,9 @@ public class Main {
 		currentLevel.add(root);
 		// Create new level for each cell in the board
 
-		for(int i = 0; i < board.getCells().size(); i++){//board.getCells().size() - 1; i++) {
+		for(int i = 0; i < 5; i++){//board.getCells().size() - 1; i++) {
 			Cell currentCell = board.getCells().get(i);
+			System.out.println(currentCell.toStringVerbose());
 			// Iterate through nodes in current level and add children
 			for(int j = currentLevel.size() - 1; j >= 0; j--) {
 				TreeNode aNode = currentLevel.get(j);
@@ -91,9 +92,9 @@ public class Main {
 				currentLevel.remove(j);
 			}
 
-			System.out.println(tree.toStringWithDepth());
-			//System.out.println("cell: " + currentCell);
-			//System.out.println("level #:\t" + i + "\tNumber of nodes on level\t" + nextLevel.size() + ": " + nextLevel.toString() + "\n");
+			//System.out.println(tree.toStringWithDepth());
+			System.out.println("cell: " + currentCell);
+			System.out.println("level #:\t" + i + "\tNumber of nodes on level\t" + nextLevel.size() + ": " + nextLevel.toString() + "\n");
 			// Update current level to next level
 			currentLevel.addAll(nextLevel);
 			nextLevel.clear();

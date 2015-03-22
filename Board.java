@@ -1,8 +1,9 @@
-package killersudokusolver;
+//package killersudokusolver;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.Hashtable;
 
 /**
  * COURSE: CECS-551 AI
@@ -24,12 +25,12 @@ public class Board {
 
     private ArrayList<Cage> cages;
     private ArrayList<Cell> cells;
-    private ArrayList<Constraint> constraints;
+    private Hashtable<String, Constraint> constraints;
 
     public Board(){
         cages = new ArrayList<Cage>();
         cells = new ArrayList<Cell>();
-        constraints = new ArrayList<Constraint>();
+        constraints = new Hashtable<String, Constraint>();
     }
 
     public void addCage(Cage c){
@@ -86,13 +87,10 @@ public class Board {
     }
 
     public void addCell(Cell cell){
-        for (Cell c : cells){
-            if (c.equals(cell)){
-                c.update(cell); //override previous cell solutions
-                return;
-            }
-        }
-        cells.add(cell);
+        Cell toUpdate = getCell(cell.getX(), cell.getY());
+        if (toUpdate != null){
+            toUpdate.update(cell); //override previous cell solutions
+        } else { cells.add(cell);}
     }
 
     /**
@@ -115,7 +113,7 @@ public class Board {
      * Returns list of all constraints on this board
      *
      */
-    public ArrayList<Constraint> getConstraints() {
+    public Hashtable<String, Constraint> getConstraints() {
         return constraints;
     }
 
@@ -124,10 +122,10 @@ public class Board {
      * Returns list of all constraints on this board
      *
      */
-    public ArrayList<Constraint> getConstraintsDeepCopy() {
-        ArrayList<Constraint> clone = new ArrayList<Constraint>();
-        for (Constraint c: constraints ) {
-            clone.add(c.clone());
+    public Hashtable<String, Constraint> getConstraintsDeepCopy() {
+        Hashtable<String, Constraint> clone = new Hashtable<String, Constraint>();
+        for (String s: constraints.keySet()) {
+            clone.put(s, constraints.get(s));
         }
         return clone;
     }
@@ -136,10 +134,13 @@ public class Board {
      * Sets list of all constraints on this board
      *
      */
+    public void setConstraints(Hashtable<String, Constraint> constraints) {
+        this.constraints = constraints;
+    }
+
     public void setConstraints(ArrayList<Constraint> constraints) {
-        for(Constraint constraint : constraints) {
-            this.constraints.add(constraint);
-        }
+        for(Constraint c: constraints)
+            this.constraints.put(c.getName(), c);
     }
     
     /**
@@ -179,9 +180,7 @@ public class Board {
         }
 
         // copy constraints
-        for(Constraint constraint : this.constraints) {
-            copy.constraints.add(constraint);
-        }
+        copy.setConstraints(this.getConstraintsDeepCopy());
 
         return copy;
     }

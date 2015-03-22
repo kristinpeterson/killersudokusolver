@@ -1,4 +1,4 @@
-package killersudokusolver;
+//package killersudokusolver;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -18,7 +18,7 @@ public class TreeNode{
 
 	public TreeNode(int d, Integer value, Cell associatedCell){
 		children = new ArrayList<TreeNode>();
-		setCell(associatedCell.clone());
+		setCell(associatedCell);
 		setValue(value);
 		depth = d;
 	}
@@ -88,7 +88,7 @@ public class TreeNode{
 	public boolean canBearChildren() {
 		// Copy the board constraints, so that they aren't effected
 		// when enforcing forward checking child bearing rule
-		ArrayList<Constraint> constraints = Main.board.getConstraintsDeepCopy();
+		Hashtable<String,Constraint> constraints = Main.board.getConstraintsDeepCopy();
 		Hashtable<String, ArrayList<Integer>> nonessential = new Hashtable<String, ArrayList<Integer>>();
 		boolean canBearChildren = true;
 		TreeNode currentNode = this;
@@ -106,9 +106,10 @@ public class TreeNode{
 		}
 
 		// Apply arc consistency like a baus
-		Util.reduceFromNE(nonessential, constraints);
-		canBearChildren = Util.applyArcConsistency(constraints);
-		
+		if ( Util.reduceFromNE(nonessential, constraints))
+			canBearChildren = Util.applyArcConsistency(constraints);
+		else
+			return false;	
 		return canBearChildren;
 	}
 }
