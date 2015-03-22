@@ -80,7 +80,6 @@ public class Constraint {
                 satisfyingAssignments.remove(j);
             }
         }
-        checkAssignments();
     }
 
     public void checkAssignments(){

@@ -80,6 +80,16 @@ public class TreeNode{
 		}
 	}
 
+	public String toStringVerbose() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("\nDepth "+depth);
+		sb.append("\t"+cell.toString()+"\n");
+		if(parent != null) {
+			sb.append( parent.toString());
+		} 
+		return sb.toString();
+	}
+
 	/**
 	 * Checks if this node can bear fruitful children
 	 *

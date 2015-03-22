@@ -1,4 +1,4 @@
-package killersudokusolver;
+//package killersudokusolver;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -113,35 +113,35 @@ public class Util {
      * @return false if any of the constraints satisfying assignment lists are reduced to zero
      */
     public static boolean reduceFromNE(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
-        ArrayList<String> keySet = new ArrayList<String>();
-        int i = 0;
         for(String s: nonessential.keySet()) {
-            // info[1] is y
-            // info[2] is x
             String[] info = s.split("_");
+            String y=info[1];
+            String x=info[2];
             for (Constraint c : constraints) {
-                Cell[] cells = c.getVariables();
-                for(int j = 0; j < cells.length; j++) {
-                    //if you've found the right cell
-                    if (cells[j].getY() == Integer.parseInt(info[1]) && cells[j].getX() == Integer.parseInt(info[2])){
-                        //pull the arraylist of nonessential values from the hash table
-                        List<Integer> temp = nonessential.get(s);
-                        //loop through the array list and remove each nonessential from the constraint and cell
-                        for(Integer assignment: temp){
-                            c.removeAssignment(j, assignment);
-                            cells[j].removeAssignment(assignment);
+                if(c.getName().contains(x+y) | c.getName().contains(x+"."+y)){ // only go through the constraint if it contains the cell
+                    Cell[] cells = c.getVariables();
+                    for(int j = 0; j < cells.length; j++) {
+                        //if you've found the right cell
+                        if (cells[j].getY() == Integer.parseInt(y) && cells[j].getX() == Integer.parseInt(x)){
+                            //pull the arraylist of nonessential values from the hash table
+                            List<Integer> temp = nonessential.get(s);
+                            //loop through the array list and remove each nonessential from the constraint and cell
+                            for(Integer assignment: temp){
+                                c.removeAssignment(j, assignment);
+                                cells[j].removeAssignment(assignment);
+                            }
+                            // Update the satisfying assignments based on the values removed
+                            if (temp.size() > 0){
+                                c.checkAssignments();
+                            }
                         }
                     }
-                }
-                if(c.getSatisfyingAssignments().size() == 0) {
-                    return false;
+                    if(c.getSatisfyingAssignments().size() == 0) {
+                        return false;
+                    }
                 }
             }
-            keySet.add(s);
-        }
-        for (String key: keySet){
-            nonessential.remove(key);
-        }
+        }    
         return true;
     }
 
