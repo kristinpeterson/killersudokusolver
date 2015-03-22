@@ -117,16 +117,19 @@ public class Util {
         ArrayList<String> keySet = new ArrayList<String>();
         int i = 0;
         for(String s: nonessential.keySet()) {
-            // info[1] is y
-            // info[2] is x
             String[] info = s.split("_");
+            int y = Integer.parseInt(info[1]);
+            int x = Integer.parseInt(info[2]);
+            //Get info from the master cell. Don't update that one though
+            //Change the cell in the constraint
+            Cell masterCell = Main.board.getCell( x, y);
 
-            for (String cname : constraints.keySet()) {
+            for (String cname : masterCell.getConstraintNames()) {
                 Constraint c = constraints.get(cname);
                 Cell[] cells = c.getVariables();
                 for(int j = 0; j < cells.length; j++) {
                     //if you've found the right cell
-                    if (cells[j].getY() == Integer.parseInt(info[1]) && cells[j].getX() == Integer.parseInt(info[2])){
+                    if (cells[j].getY() == y && cells[j].getX() == x){
                         //pull the arraylist of nonessential values from the hash table
                         List<Integer> temp = nonessential.get(s);
                         //loop through the array list and remove each nonessential from the constraint and cell
@@ -136,13 +139,14 @@ public class Util {
                         }
                         if (temp.size() > 0)
                             c.checkAssignments();
+                    
+                    }
+                    if(c.getSatisfyingAssignments().size() == 0) {
+                        return false;
                     }
                 }
-                if(c.getSatisfyingAssignments().size() == 0) {
-                    return false;
-                }
-            }
             keySet.add(s);
+            }
         }
         for (String key: keySet){
             nonessential.remove(key);
