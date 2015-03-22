@@ -54,6 +54,13 @@ public class Constraint {
         return variables;
     }
 
+    public int getCellIndex(int x, int y){
+        for(int i=0; i<variables.length; i++)
+            if(variables[i].equals(new Cell(x,y)))
+                return i;
+        return -1;
+    }
+
     public void setSatisfyingAssignments(ArrayList<ArrayList<Integer>> satisfyingAssignments) {
         ArrayList<ArrayList<Integer>> satisfyingAssignmentsClone = new ArrayList<ArrayList<Integer>>();
         for(ArrayList<Integer> assignment : satisfyingAssignments) {
@@ -81,6 +88,7 @@ public class Constraint {
                 satisfyingAssignments.remove(j);
             }
         }
+        variables[cellIndex].removeAssignment(val);
     }
 
     public void checkAssignments(){

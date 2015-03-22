@@ -94,12 +94,10 @@ public class Util {
         for(String s: constraints.keySet()) {
             Constraint c = constraints.get(s);
             for (Cell cell : c.getVariables()) {
-                ArrayList<Integer> domain = cell.getDomain();
-                if (domain.size() < 9) {
-                    for (int n = 1; n < 10; n++) {
-                        if (!domain.contains(n)) {
-                            addNonEssential(nonessential, "cell_" + cell.getY() + "_" + cell.getX(), n);
-                        }
+                ArrayList<Integer> cellNE = cell.getNonessential();
+                if (cellNE.size() > 0) {
+                    for (Integer ne : cellNE) {
+                        addNonEssential(nonessential, "cell_" + cell.getY() + "_" + cell.getX(), ne);
                     }
                 }
             }
@@ -126,27 +124,22 @@ public class Util {
 
             for (String cname : masterCell.getConstraintNames()) {
                 Constraint c = constraints.get(cname);
-                Cell[] cells = c.getVariables();
-                for(int j = 0; j < cells.length; j++) {
-                    //if you've found the right cell
-                    if (cells[j].getY() == y && cells[j].getX() == x){
+                int j = c.getCellIndex(x,y);
+                
                         //pull the arraylist of nonessential values from the hash table
                         List<Integer> temp = nonessential.get(s);
                         //loop through the array list and remove each nonessential from the constraint and cell
                         for(Integer assignment: temp){
                             c.removeAssignment(j, assignment);
-                            cells[j].removeAssignment(assignment);
                         }
-                        if (temp.size() > 0)
-                            c.checkAssignments();
-                    
-                    }
+                        if (temp.size() > 0){
+                            c.checkAssignments(); 
+                        }
                     if(c.getSatisfyingAssignments().size() == 0) {
                         return false;
                     }
-                }
-            keySet.add(s);
             }
+            keySet.add(s);
         }
         for (String key: keySet){
             nonessential.remove(key);
