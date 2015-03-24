@@ -72,6 +72,41 @@ public class Util {
         }
     }
 
+        /**
+     * Prints the necessary output for Milestone 1:
+     *
+     * Each constraint, dependent variables, cardinality of satisfying assignments
+     * before and after arc consistency performed.
+     *
+     * @throws Exception
+     */
+    public static void printM2Output() {
+        try {
+            File of = new File("m2output.txt");
+            BufferedWriter output = new BufferedWriter(new FileWriter(of));
+            String separator = "**************************\n";
+
+            // Temporary output of constraint cardinality before arc consistency has been performed
+            output.write(separator);
+            for(int i = 0; i < Main.board.getCells().size(); i++){//board.getCells().size() - 1; i++) {
+                Cell currentCell = Main.board.getCells().get(i);
+                String x= ""+currentCell.getX();
+                String y= ""+currentCell.getY();
+                output.write("Depth: " +i+ "\tVariable: row "+y+ " col "+x+"\n");
+                for (Constraint c : Main.board.getConstraints()) {
+                    if(c.getName().contains(x+y) | c.getName().contains(x+"."+y)){ 
+                        output.write(c.getName()+"\t");
+                    }
+                }
+                output.write(separator);
+            }
+            output.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Applies arc consistency on the given list of constraints
      *

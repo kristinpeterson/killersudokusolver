@@ -66,6 +66,9 @@ public class Main {
 
 		// Create tree to search for solution
 		board.orderCellsAscending(); // orders cells in increasing satisfying assignment order
+
+		Util.printM2Output();
+
 		Tree tree = new Tree();
 		TreeNode root = new TreeNode();
 		tree.setRoot(root);
