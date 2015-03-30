@@ -62,13 +62,11 @@ public class Util {
             output.close();
 
             // Cleanup:
-
             // Clear categorized constraint lists from memory
             Main.cageConstraints.clear();
             Main.colConstraints.clear();
             Main.nonetConstraints.clear();
             Main.rowConstraints.clear();
-
             // Clear Board.cages from memory, no longer needed
             Main.board.getCages().clear();
         } catch (Exception e) {
@@ -90,22 +88,20 @@ public class Util {
             BufferedWriter output = new BufferedWriter(new FileWriter(of));
             String separator = "**************************\n";
 
-            // Temporary output of constraint cardinality before arc consistency has been performed
             output.write(separator);
-            for(int i = 0; i < Main.board.getCells().size(); i++){//board.getCells().size() - 1; i++) {
+            for(int i = 0; i < Main.board.getCells().size(); i++){
                 Cell currentCell = Main.board.getCells().get(i);
-                String x= ""+currentCell.getX();
-                String y= ""+currentCell.getY();
-                output.write("Depth: " +i+ "\tVariable: row "+y+ " col "+x+"\n");
+                String x = Integer.toString(currentCell.getX());
+                String y = Integer.toString(currentCell.getY());
+                output.write("Depth: " + i + "\tVariable: row " + y + " col " + x + "\n");
                 for (Constraint c : Main.board.getConstraints()) {
-                    if(c.getName().contains(x+y) | c.getName().contains(x+"."+y)){ 
-                        output.write(c.getName()+"\t");
+                    if(c.getName().contains(x + y) | c.getName().contains(x + "." + y )){
+                        output.write(c.getName() + "\t");
                     }
                 }
                 output.write(separator);
             }
             output.close();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
