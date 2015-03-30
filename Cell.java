@@ -1,3 +1,5 @@
+package killersudokusolver;
+
 import java.util.ArrayList;
 
 /**
@@ -15,72 +17,117 @@ public class Cell{
 
 	private int x;
 	private int y;
-	private int value;
-	private ArrayList<Integer> possibleSolutions;
+	private ArrayList<Integer> domain;
 
+	/**
+	 * Cell constructor, sets x and y values based on given
+	 * int parameters.
+	 * Initializes empty domain list.
+	 *
+	 * @param x the cells x value (row)
+	 * @param y the cells y value (column)
+	 */
 	public Cell(int x, int y){
 		this.x = x;
 		this.y = y;
-		possibleSolutions = new ArrayList<Integer>();
+		domain = new ArrayList<Integer>();
 	}
 
+	/**
+	 * Cell constructor, sets x and y values based on given
+	 * string parameters.
+	 * Initializes empty domain list.
+	 * Sets initial value to -1 as a flag that the value has not yet been set.
+	 *
+	 * @param xs string representation of the cells x value
+	 * @param ys string representation of the cells y value
+	 */
 	public Cell(String xs, String ys){
 		x = Integer.parseInt(xs);
 		y = Integer.parseInt(ys);
-		possibleSolutions = new ArrayList<Integer>();
+		domain = new ArrayList<Integer>();
 	}
 
-	public void setX(int x){
-		this.x = x;
+	/**
+	 * Returns a deep copy of the cell
+	 *
+	 * @return a deep copy of the cell
+	 */
+	public Cell getDeepCopy(){
+		Cell copy = new Cell(x, y);
+		copy.domain = getDomainDeepCopy();
+		return copy;
 	}
 
-	public void setY(int y){
-		this.y = y;
-	}
-
+	/**
+	 * Returns the x value of this cell.
+	 *
+	 * @return the x value of this cell
+	 */
 	public int getX(){
 		return x;
 	}
 
+	/**
+	 * Returns the y value of this cell.
+	 *
+	 * @return the y value of this cell
+	 */
 	public int getY(){
 		return y;
 	}
 
-	public void setValue(int num){
-		value = num;
+	/**
+	 * Checks if given cell is equal to this cell
+	 * (based on x and y values)
+	 *
+	 * @param cell the cell being checked for equality to this cell
+	 * @return true if the given cell is equal to this cell (based on x and y values)
+	 */
+	public boolean equals(Cell cell){
+		return this.x == cell.getX() && this.y == cell.getY();
 	}
 
-	public void setValue(Integer num){
-		value = num.intValue();
+	/**
+	 * Adds a value to the cells domain list
+	 *
+	 * @param domainValue the value to add to this cells domain list
+	 */
+	public void addDomainValue(Integer domainValue){
+		if(!domain.contains(domainValue))
+			domain.add(domainValue);
 	}
 
-	public boolean equals(Cell c){
-		return this.x == c.getX() && this.y == c.getY();
+	/**
+	 * Removes the given value from the domain.
+	 *
+	 * @param domainValue the domain value to remove
+	 * @return true if the domain value was successfully removed
+	 */
+	public boolean removeDomainValue(Integer domainValue){
+		return domain.remove(domainValue);
 	}
 
-	public int getValue(){
-		return value;
-	}
-
-	public boolean isSolution(Integer i){
-		return possibleSolutions.contains(i);
-	}
-
-	public void addSolution(Integer i){
-		if(!possibleSolutions.contains(i))
-			possibleSolutions.add(i);
-	}
-
-	public boolean removeSolution(Integer i){
-		return possibleSolutions.remove(i);
-	}
-
-	public ArrayList<Integer> getSolutions() {
+	/**
+	 * Return a deep copy of this cells domain values list
+	 *
+	 * @return a deep copy of this cells domain values list
+	 */
+	public ArrayList<Integer> getDomainDeepCopy() {
 		ArrayList<Integer> solutionsClone = new ArrayList<Integer>();
-		for (Integer i : possibleSolutions) {
+		for (Integer i : domain) {
 			solutionsClone.add(i);
 		}
 		return solutionsClone;
+	}
+
+	/**
+	 * Returns a list of this cells domain values
+	 *
+	 * @return a list of this cells domain values
+	 */
+	public ArrayList<Integer> getDomain() {
+		return this.domain;
 	}
 
 	/** Return which nonet this cell would be in
@@ -118,8 +165,14 @@ public class Cell{
 
 	}
 
+	/**
+	 * Returns a string representation of this cell
+	 * x: [x-value] y: [y-value] domain: [cells-domain-list]
+	 *
+	 * @return a string representation of this cell
+	 */
 	public String toString() {
-		return "x: " + x + " y: " + y + " domain: " + getSolutions() + "\n";
+		return "x: " + x + " y: " + y + " domain: " + getDomain();
 	}
 
 }
