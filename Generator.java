@@ -15,7 +15,6 @@ import java.util.ArrayList;
  */
 public class Generator{
 
-	//?private int step_count;
 	private int depth;
 	private ArrayList<Constraint> filters;
 	private Cell associatedCell;
@@ -41,8 +40,6 @@ public class Generator{
 
 	public void setValue(int step_count){
 		ArrayList<Integer> domain = associatedCell.getDomain();
-		/* */
-		
 	}
 
 

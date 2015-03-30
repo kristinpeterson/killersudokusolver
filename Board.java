@@ -26,24 +26,48 @@ public class Board {
     private ArrayList<Cell> cells;
     private ArrayList<Constraint> constraints;
 
+    /**
+     * Default constructor for the Killer Sudoku board.
+     * Initializes the board's cage, cell and constraint lists
+     *
+     */
     public Board(){
         cages = new ArrayList<Cage>();
         cells = new ArrayList<Cell>();
         constraints = new ArrayList<Constraint>();
     }
 
-    public void addCage(Cage c){
-        cages.add(c);
+    /**
+     * Adds a cage to the board's cage list
+     *
+     * @param cage a cage to add to the board's cage list
+     */
+    public void addCage(Cage cage){
+        cages.add(cage);
     }
 
+    /**
+     * Return a list of the board's cages
+     *
+     * @return a list of the board's cages
+     */
     public ArrayList<Cage> getCages(){
         return cages;
     }
 
+    /**
+     * Return a list of the board's cells
+     *
+     * @return a list of the board's cells
+     */
     public ArrayList<Cell> getCells() {
         return cells;
     }
 
+    /**
+     * Orders the boards cells in ascending-domain-size order
+     *
+     */
     public void orderCellsAscending(){
         ArrayList<Cell> orderedCells = new ArrayList<Cell>();
         ArrayList<Cell> one = new ArrayList<Cell>();
@@ -86,12 +110,6 @@ public class Board {
     }
 
     public void addCell(Cell cell){
-        for (Cell c : cells){
-            if (c.equals(cell)){
-                c.update(cell); //override previous cell solutions
-                return;
-            }
-        }
         cells.add(cell);
     }
 
@@ -114,41 +132,44 @@ public class Board {
     /**
      * Returns list of all constraints on this board
      *
+     * @return returns the boards constraint list
      */
     public ArrayList<Constraint> getConstraints() {
         return constraints;
     }
 
-
     /**
      * Returns list of all constraints on this board
      *
+     * @return a deep copy of the boards constraints
      */
     public ArrayList<Constraint> getConstraintsDeepCopy() {
-        ArrayList<Constraint> clone = new ArrayList<Constraint>();
-        for (Constraint c: constraints ) {
-            clone.add(c.clone());
+        ArrayList<Constraint> constraintDeepCopy = new ArrayList<Constraint>();
+        for (Constraint constraint: constraints ) {
+            constraintDeepCopy.add(constraint.getDeepCopy());
         }
-        return clone;
+        return constraintDeepCopy;
     }
 
     /**
-     * Sets list of all constraints on this board
+     * Adds a list of constraints to the boards constraint list
      *
+     * @param constraints an array list of constraints to add to the boards constraints
      */
     public void setConstraints(ArrayList<Constraint> constraints) {
         for(Constraint constraint : constraints) {
             this.constraints.add(constraint);
         }
     }
-    
+
     /**
-     * Returns an array of Cells for the given nonet number
+     *  Returns an array of Cells for the given nonet number
      * 	1 2 3
      *  4 5 6
      *  7 8 9
      *
-     * @return
+     * @param nonetNumber the nonet number to obtain cells from
+     * @return an array of cells contained in the given nonet number
      */
     public Cell[] getNonetCells(int nonetNumber) {
         Cell[] cells = new Cell[9];
@@ -165,7 +186,14 @@ public class Board {
         return cells;
     }
 
-    public Board copy() {
+    /**
+     * Make a deep copy of the Killer Sudoku board.
+     *
+     * (All cage, cell & constraint lists are deep copies)
+     *
+     * @return a deep copy of the Killer Sudoku board
+     */
+    public Board deepCopy() {
         Board copy = new Board();
 
         // copy cages

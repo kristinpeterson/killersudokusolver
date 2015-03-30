@@ -35,7 +35,7 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		// Add cells to board
+		/** Add cells to board */
 		for(Cage cage : board.getCages()) {
 			for(Cell cell : cage.getCells()) {
 				board.addCell(cell);
@@ -146,7 +146,7 @@ public class Main {
 		// Build cageConstraints
 		for(Cage cage : board.getCages()) {
 			Cell[] variables = cage.getCellsAsArray();
-			cageConstraints.add(new Constraint(cage.getCageId(), variables, cage.getPermutatedSolutions()));
+			cageConstraints.add(new Constraint(cage.toString(), variables, cage.getPermutatedSolutions()));
 		}
 
 		// Assign all constraints to the puzzle Board.constraints member

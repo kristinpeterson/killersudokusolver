@@ -17,88 +17,103 @@ public class Cell{
 
 	private int x;
 	private int y;
-	private int value;
-	private ArrayList<Integer> nonessential;
 	private ArrayList<Integer> domain;
 
+	/**
+	 * Cell constructor, sets x and y values based on given
+	 * int parameters.
+	 * Initializes empty domain list.
+	 *
+	 * @param x the cells x value (row)
+	 * @param y the cells y value (column)
+	 */
 	public Cell(int x, int y){
 		this.x = x;
 		this.y = y;
 		domain = new ArrayList<Integer>();
-		nonessential = new ArrayList<Integer>();
-		value = -1;	// set to -1 as a flag that value hasn't been set
 	}
 
+	/**
+	 * Cell constructor, sets x and y values based on given
+	 * string parameters.
+	 * Initializes empty domain list.
+	 * Sets initial value to -1 as a flag that the value has not yet been set.
+	 *
+	 * @param xs string representation of the cells x value
+	 * @param ys string representation of the cells y value
+	 */
 	public Cell(String xs, String ys){
 		x = Integer.parseInt(xs);
 		y = Integer.parseInt(ys);
 		domain = new ArrayList<Integer>();
-		nonessential = new ArrayList<Integer>();
-		value = -1;	// set to -1 as a flag that value hasn't been set
 	}
 
-	public Cell clone(){
+	/**
+	 * Returns a deep copy of the cell
+	 *
+	 * @return a deep copy of the cell
+	 */
+	public Cell getDeepCopy(){
 		Cell copy = new Cell(x, y);
-		copy.domain = getDomain();
-		copy.value = value;
+		copy.domain = getDomainDeepCopy();
 		return copy;
 	}
 
+	/**
+	 * Returns the x value of this cell.
+	 *
+	 * @return the x value of this cell
+	 */
 	public int getX(){
 		return x;
 	}
 
+	/**
+	 * Returns the y value of this cell.
+	 *
+	 * @return the y value of this cell
+	 */
 	public int getY(){
 		return y;
 	}
 
 	/**
-	 * Sets the cells value, updates domain to equal just the value,
-	 * and compiles nonesential values (ie all values not equal to value being set)
+	 * Checks if given cell is equal to this cell
+	 * (based on x and y values)
 	 *
-	 * @param num the value to set cell to
+	 * @param cell the cell being checked for equality to this cell
+	 * @return true if the given cell is equal to this cell (based on x and y values)
 	 */
-	public void setValue(Integer num){
-		value = num.intValue();
-		for(int i = domain.size() - 1; i >= 0; i--) {
-			if(domain.get(i) != value) {
-				nonessential.add(domain.get(i));
-				domain.remove(i);
-			}
-		}
+	public boolean equals(Cell cell){
+		return this.x == cell.getX() && this.y == cell.getY();
 	}
 
-	public int getValue() {
-		return value;
+	/**
+	 * Adds a value to the cells domain list
+	 *
+	 * @param domainValue the value to add to this cells domain list
+	 */
+	public void addDomainValue(Integer domainValue){
+		if(!domain.contains(domainValue))
+			domain.add(domainValue);
 	}
 
-	public boolean equals(Cell c){
-		return this.x == c.getX() && this.y == c.getY();
+	/**
+	 * Removes the given value from the domain.
+	 *
+	 * @param domainValue the domain value to remove
+	 * @return true if the domain value was successfully removed
+	 */
+	public boolean removeDomainValue(Integer domainValue){
+		return domain.remove(domainValue);
 	}
 
-	public boolean update(Cell c){
-		if(this.equals(c)){
-			this.value = c.value;
-			domain = c.getDomain();
-			return false;
-		}
-		return false;
-	}
-
-	public void addDomainValue(Integer i){
-		if(!domain.contains(i))
-			domain.add(i);
-		nonessential.remove(i);
-	}
-
-	public boolean removeAssignment(Integer i){
-		boolean removed = domain.remove(i); 
-		if(removed) // if successfully removed, add value to nonessential list
-			nonessential.add(i);
-		return removed;
-	}
-
-	public ArrayList<Integer> getDomain() {
+	/**
+	 * Return a deep copy of this cells domain values list
+	 *
+	 * @return a deep copy of this cells domain values list
+	 */
+	public ArrayList<Integer> getDomainDeepCopy() {
 		ArrayList<Integer> solutionsClone = new ArrayList<Integer>();
 		for (Integer i : domain) {
 			solutionsClone.add(i);
@@ -106,8 +121,13 @@ public class Cell{
 		return solutionsClone;
 	}
 
-	public ArrayList<Integer> getNonessential() {
-		return nonessential;
+	/**
+	 * Returns a list of this cells domain values
+	 *
+	 * @return a list of this cells domain values
+	 */
+	public ArrayList<Integer> getDomain() {
+		return this.domain;
 	}
 
 	/** Return which nonet this cell would be in
@@ -145,6 +165,12 @@ public class Cell{
 
 	}
 
+	/**
+	 * Returns a string representation of this cell
+	 * x: [x-value] y: [y-value] domain: [cells-domain-list]
+	 *
+	 * @return a string representation of this cell
+	 */
 	public String toString() {
 		return "x: " + x + " y: " + y + " domain: " + getDomain();
 	}

@@ -23,11 +23,10 @@ public class Cage {
 
 	private int goal;
 	private List<Cell> cells;
-	private String cageId;
 	private List<Stack<Integer>> permutatedSolutions;
 
 	/**
-	 * Cage constructor, takes input from raw text file and
+	 * Cage constructor, takes an input string and
 	 * constructs Cage object
 	 *
 	 * Info format:
@@ -36,7 +35,7 @@ public class Cage {
 	 * where:
 	 * x == row
 	 * y == col
-	 * g == Cage goal
+	 * g == Cage sum goal
 	 *
 	 * @param info Cage info from raw text file
 	 */
@@ -50,22 +49,32 @@ public class Cage {
 				i++; //increment extra to account for y
 			}
 		}
-		cageId = getCageId();
 		permutatedSolutions = new ArrayList<Stack<Integer>>();
 	}
 
+	/**
+	 * Returns the sum goal for this cage
+	 *
+	 * @return the sum goal for this cage
+	 */
 	public int getGoal()  {
 		return goal;
 	}
 
-	public int getSize()  {
-		return cells.size();
-	}
-
+	/**
+	 * Returns a list of cells that comprise this cage
+	 *
+	 * @return a list of cells that the cage is comprised of
+	 */
 	public List<Cell> getCells() {
 		return cells;
 	}
 
+	/**
+	 * Return the list of cells as an array of cells
+	 *
+	 * @return the list of cells as an array of cells
+	 */
 	public Cell[] getCellsAsArray() {
 		int numCells = this.cells.size();
 		Cell[] cells = new Cell[numCells];
@@ -73,26 +82,6 @@ public class Cage {
 			cells[i] = this.cells.get(i);
 		}
 		return cells;
-	}
-
-	public boolean rowOnly() {
-		int row = cells.get(0).getY();
-		for (int i=1; i<cells.size(); i++) {
-			if (cells.get(i).getY() != row) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public boolean columnOnly() {
-		int col = cells.get(0).getX();
-		for (int i=1; i<cells.size(); i++) {
-			if (cells.get(i).getX() != col) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	/**
@@ -132,19 +121,6 @@ public class Cage {
 		return solutionsClone;
 	}
 
-
-	public String getCageId() {
-		StringBuilder sb = new StringBuilder();
-		for (Cell t : cells) {
-			sb.append(t.getX());
-			sb.append(".");
-			sb.append(t.getY());
-			sb.append(",");
-		}
-		sb.append("g").append(goal);
-		return sb.toString();
-	}
-
 	/**
 	 * Finds all unique permutations of each solution Stack
 	 *
@@ -179,9 +155,33 @@ public class Cage {
 		}
 	}
 
+	/**
+	 * Builds a string representation of the cage, which identifies
+	 * the cage's cells (x & y value) and the sum goal
+	 *
+	 * @return a string representation of the cage
+	 */
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(cageId).append("\n");
+		for (Cell t : cells) {
+			sb.append(t.getX());
+			sb.append(".");
+			sb.append(t.getY());
+			sb.append(",");
+		}
+		sb.append("g").append(goal);
+		return sb.toString();
+	}
+
+	/**
+	 * A string representation of the cage
+	 * [cage-id] + [cage-cells] + [sum-goal] + [list of permutated possible solutions]
+	 *
+	 * @return a string representation of the cage
+	 */
+	public String toStringWithSolutions() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(toString()).append("\n");
 		for (Cell cell : cells) {
 			sb.append(cell.toString());
 		}

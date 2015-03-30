@@ -25,9 +25,9 @@ public class Util {
      * Each constraint, dependent variables, cardinality of satisfying assignments
      * before and after arc consistency performed.
      *
-     * @throws Exception
+     * @throws Exception if any issues encountered when writing data to output file
      */
-    public static void printM1Output() {
+    public static void printM1Output() throws Exception {
         try {
             File of = new File("m1output.txt");
             BufferedWriter output = new BufferedWriter(new FileWriter(of));
@@ -36,22 +36,26 @@ public class Util {
             // Temporary output of constraint cardinality before arc consistency has been performed
             output.write(separator);
             for (Constraint c : Main.rowConstraints) {
-                String outputString = "Row constraint: " + c.getName() + ":\t" + "Cardinality before AC:\t" + c.preSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size() + "\n";
+                String outputString = "Row constraint: " + c.getName() + ":\t" + "Cardinality before AC:\t"
+                        + c.initialSatisfyingAssignmentSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size() + "\n";
                 output.write(outputString);
             }
             output.write(separator);
             for (Constraint c : Main.colConstraints) {
-                String outputString = "Column constraint: " + c.getName() + ":\t" + "Cardinality before AC:\t" + c.preSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size() + "\n";
+                String outputString = "Column constraint: " + c.getName() + ":\t" + "Cardinality before AC:\t"
+                        + c.initialSatisfyingAssignmentSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size() + "\n";
                 output.write(outputString);
             }
             output.write(separator);
             for (Constraint c : Main.cageConstraints) {
-                String outputString = "Sum constraint: " + c.getName() + ":\n\t\t" + "Cardinality before AC:\t" + c.preSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size() + "\n";
+                String outputString = "Sum constraint: " + c.getName() + ":\n\t\t" + "Cardinality before AC:\t"
+                        + c.initialSatisfyingAssignmentSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size() + "\n";
                 output.write(outputString);
             }
             output.write(separator);
             for (Constraint c : Main.nonetConstraints) {
-                String outputString = "Grid constraint: " + c.getName() + ":\t" + "Cardinality before AC:\t" + c.preSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size() + "\n";
+                String outputString = "Grid constraint: " + c.getName() + ":\t" + "Cardinality before AC:\t"
+                        + c.initialSatisfyingAssignmentSize + "\tCardinality after AC:\t" + c.getSatisfyingAssignments().size() + "\n";
                 output.write(outputString);
             }
 
@@ -72,15 +76,15 @@ public class Util {
         }
     }
 
-        /**
-     * Prints the necessary output for Milestone 1:
+    /**
+     * Prints the necessary output for Milestone 2:
      *
-     * Each constraint, dependent variables, cardinality of satisfying assignments
-     * before and after arc consistency performed.
+     * Print the "tree" structure level by level, including each levels depth,
+     * generator (cell), and filters (constraints).
      *
-     * @throws Exception
+     * @throws Exception if any issues encountered when writing data to output file
      */
-    public static void printM2Output() {
+    public static void printM2Output() throws Exception {
         try {
             File of = new File("m2output.txt");
             BufferedWriter output = new BufferedWriter(new FileWriter(of));
@@ -142,9 +146,11 @@ public class Util {
     }
 
     /**
-     * Goes through the nonessential list and removes non-essential assignments
+     * Goes through the nonessential list and removes nonessential assignments
      * from constraints
      *
+     * @param nonessential a list of nonessential assignments to be removed
+     * @param constraints the constraints from which non-essential assignments are being removed
      * @return false if any of the constraints satisfying assignment lists are reduced to zero
      */
     public static boolean reduceFromNE(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
@@ -152,9 +158,9 @@ public class Util {
             String[] info = s.split("_");
             String y=info[1];
             String x=info[2];
-            for (Constraint c : constraints) {
-                if(c.getName().contains(x+y) | c.getName().contains(x+"."+y)){ // only go through the constraint if it contains the cell
-                    Cell[] cells = c.getVariables();
+            for (Constraint constraint : constraints) {
+                if(constraint.getName().contains(x+y) | constraint.getName().contains(x+"."+y)){ // only go through the constraint if it contains the cell
+                    Cell[] cells = constraint.getVariables();
                     for(int j = 0; j < cells.length; j++) {
                         //if you've found the right cell
                         if (cells[j].getY() == Integer.parseInt(y) && cells[j].getX() == Integer.parseInt(x)){
@@ -162,16 +168,16 @@ public class Util {
                             List<Integer> temp = nonessential.get(s);
                             //loop through the array list and remove each nonessential from the constraint and cell
                             for(Integer assignment: temp){
-                                c.removeAssignment(j, assignment);
-                                cells[j].removeAssignment(assignment);
+                                constraint.removeAssignment(j, assignment);
+                                cells[j].removeDomainValue(assignment);
                             }
                             // Update the satisfying assignments based on the values removed
                             if (temp.size() > 0){
-                                c.checkAssignments();
+                                constraint.updateVariableAssignments();
                             }
                         }
                     }
-                    if(c.getSatisfyingAssignments().size() == 0) {
+                    if(constraint.getSatisfyingAssignments().size() == 0) {
                         return false;
                     }
                 }
