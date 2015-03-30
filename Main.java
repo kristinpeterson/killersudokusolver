@@ -59,48 +59,13 @@ public class Main {
 		// Build list of all problem constraints
 		buildConstraints();
 
+		// Milestone 1: apply arc consistency and print results to m1output.txt
 		Util.applyArcConsistency(board.getConstraints());
-
-		// Print Milestone 1 output (before clearing categorized constraint lists)
 		Util.printM1Output();
 
-		// Create tree to search for solution
-		board.orderCellsAscending(); // orders cells in increasing satisfying assignment order
-
+		// Milestone 2: order cells in ascending-domain-size order and print results to m2output.txt
+		board.orderCellsAscending();
 		Util.printM2Output();
-
-		Tree tree = new Tree();
-		TreeNode root = new TreeNode();
-		tree.setRoot(root);
-		List<TreeNode> currentLevel = new ArrayList<TreeNode>();
-		List<TreeNode> nextLevel = new ArrayList<TreeNode>();
-		currentLevel.add(root);
-		// Create new level for each cell in the board
-
-		for(int i = 0; i < board.getCells().size(); i++){//board.getCells().size() - 1; i++) {
-			Cell currentCell = board.getCells().get(i);
-			// Iterate through nodes in current level and add children
-			for(int j = currentLevel.size() - 1; j >= 0; j--) {
-				TreeNode aNode = currentLevel.get(j);
-				for(Integer value : currentCell.getDomain()) {
-					TreeNode newNode = new TreeNode(i, value, currentCell);
-					newNode.setParent(aNode);
-					if(newNode.canBearChildren()) {
-						// Only add node if it can bear children
-						aNode.addChild(newNode);
-						nextLevel.add(newNode);
-					}  // add something here to mark dead end? or prune?
-				}
-				currentLevel.remove(j);
-			}
-
-			System.out.println(tree.toStringWithDepth());
-			//System.out.println("cell: " + currentCell);
-			//System.out.println("level #:\t" + i + "\tNumber of nodes on level\t" + nextLevel.size() + ": " + nextLevel.toString() + "\n");
-			// Update current level to next level
-			currentLevel.addAll(nextLevel);
-			nextLevel.clear();
-		}
 	}
 
 	/**

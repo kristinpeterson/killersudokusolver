@@ -1,4 +1,4 @@
-//package killersudokusolver;
+package killersudokusolver;
 
 import java.io.BufferedWriter;
 import java.io.File;

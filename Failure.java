@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.Hashtable;
+package killersudokusolver;
 
 /**
  * COURSE: CECS-551 AI
