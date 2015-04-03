@@ -131,9 +131,7 @@ public class Util {
                 DomainSet domain = cell.getDomain();
                 if (domain.domainSize() < 9) {
                     for (int n = 1; n < 10; n++) {
-                        System.out.println(cell.getDomain().toString());
                         if (!domain.contains(n)) {
-                            System.out.println("adding ne: " + n + " " + cell.getX() + cell.getY());
                             addNonEssential(nonessential, "cell_" + cell.getX() + "_" + cell.getY(), n);
                         }
                     }
