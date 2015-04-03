@@ -20,6 +20,7 @@ public class Constraint {
     private Cell[] variables;
     private ArrayList<ArrayList<Integer>> satisfyingAssignments;
     public final int initialSatisfyingAssignmentSize; // initial number of satisfying assignments
+    private ArrayList<FilterTable> filterTables;
 
     /**
      * Constraint constructor, sets the constraints name,
@@ -36,6 +37,7 @@ public class Constraint {
         setVariables(variables);
         setSatisfyingAssignments(satisfyingAssignments);
         initialSatisfyingAssignmentSize = satisfyingAssignments.size();
+        filterTables = new ArrayList<FilterTable>();
     }
 
     /**
@@ -49,6 +51,24 @@ public class Constraint {
             copyCells[i] = variables[i].getDeepCopy();
         }
         return new Constraint(this.getName(), copyCells, this.getSatisfyingAssignmentsDeepCopy());
+    }
+
+    /**
+     * Sets the list of filter tables
+     *
+     * @param filterTables the list of filter tables to set
+     */
+    public void setFilterTable(ArrayList<FilterTable> filterTables) {
+        this.filterTables = filterTables;
+    }
+
+    /**
+     * Returns the list of filter tables
+     *
+     * @return the list of filter tables
+     */
+    public ArrayList<FilterTable> getFilterTables() {
+        return filterTables;
     }
 
     /**

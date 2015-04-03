@@ -13,11 +13,17 @@ import java.util.ArrayList;
  * @author Ariel Katz
  *
  */
-public class Cell{
+public class Cell {
 
 	private int x;
 	private int y;
-	private ArrayList<Integer> domain;
+	private DomainSet domain;
+	private int nonet;
+
+	// used during forward checking / backtracking
+	private DomainValue value;	//currently assigned value
+	private Integer last_assigned;  //step that this variable was last assigned
+
 
 	/**
 	 * Cell constructor, sets x and y values based on given
@@ -30,7 +36,8 @@ public class Cell{
 	public Cell(int x, int y){
 		this.x = x;
 		this.y = y;
-		domain = new ArrayList<Integer>();
+		this.domain = new DomainSet();
+		this.nonet = setNonet();
 	}
 
 	/**
@@ -43,9 +50,10 @@ public class Cell{
 	 * @param ys string representation of the cells y value
 	 */
 	public Cell(String xs, String ys){
-		x = Integer.parseInt(xs);
-		y = Integer.parseInt(ys);
-		domain = new ArrayList<Integer>();
+		this.x = Integer.parseInt(xs);
+		this.y = Integer.parseInt(ys);
+		this.domain = new DomainSet();
+		this.nonet = setNonet();
 	}
 
 	/**
@@ -93,9 +101,9 @@ public class Cell{
 	 *
 	 * @param domainValue the value to add to this cells domain list
 	 */
-	public void addDomainValue(Integer domainValue){
+	public void addDomainValue(DomainValue domainValue){
 		if(!domain.contains(domainValue))
-			domain.add(domainValue);
+			domain.addDomainValue(domainValue);
 	}
 
 	/**
@@ -105,7 +113,7 @@ public class Cell{
 	 * @return true if the domain value was successfully removed
 	 */
 	public boolean removeDomainValue(Integer domainValue){
-		return domain.remove(domainValue);
+		return domain.removeDomainValue(domainValue);
 	}
 
 	/**
@@ -113,31 +121,32 @@ public class Cell{
 	 *
 	 * @return a deep copy of this cells domain values list
 	 */
-	public ArrayList<Integer> getDomainDeepCopy() {
-		ArrayList<Integer> solutionsClone = new ArrayList<Integer>();
-		for (Integer i : domain) {
-			solutionsClone.add(i);
+	public DomainSet getDomainDeepCopy() {
+		DomainSet domainClone = new DomainSet();
+		for (DomainValue i : domain.getDomainValues()) {
+			domainClone.getDomainValues().add(i);
 		}
-		return solutionsClone;
+		return domainClone;
 	}
 
 	/**
-	 * Returns a list of this cells domain values
+	 * Returns a DomainSet for this cell
 	 *
-	 * @return a list of this cells domain values
+	 * @return a DomainSet for this cell
 	 */
-	public ArrayList<Integer> getDomain() {
+	public DomainSet getDomain() {
 		return this.domain;
 	}
 
-	/** Return which nonet this cell would be in
+	/**
+	 * Sets which nonet this cell would be in
 	 *  1 2 3
 	 *  4 5 6
 	 *  7 8 9
 	 *
 	 *  Nonet: A 3×3 grid of cells, as outlined by the bolder lines in the puzzle
 	*/
-	public int getNonet(){
+	public int setNonet(){
 		if (this.getX() < 4){
 			if (this.getY() < 4) {
 				return 1;
@@ -162,7 +171,18 @@ public class Cell{
 			}
 			return 9;
 		}
+	}
 
+	/**
+	 * Returns which nonet number the cell is in
+	 *  1 2 3
+	 *  4 5 6
+	 *  7 8 9
+	 *
+	 * @return which nonet number the cell is in
+	 */
+	public int getNonet() {
+		return nonet;
 	}
 
 	/**

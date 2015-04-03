@@ -80,7 +80,7 @@ public class Board {
         ArrayList<Cell> eight = new ArrayList<Cell>();
         ArrayList<Cell> nine = new ArrayList<Cell>();
         for(Cell c : cells) {
-            switch(c.getDomain().size()) {
+            switch(c.getDomain().domainSize()) {
                 case 1: one.add(c); break;
                 case 2: two.add(c); break;
                 case 3: three.add(c); break;
@@ -176,9 +176,6 @@ public class Board {
         int i = 0;
         for(Cell cell : this.cells) {
             if(cell.getNonet() == nonetNumber) {
-                if(i == 9) {
-                    System.out.println(nonetNumber);
-                }
                 cells[i] = cell;
                 i++;
             }

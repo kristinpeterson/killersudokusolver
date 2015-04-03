@@ -128,11 +128,13 @@ public class Util {
     private static Hashtable<String, ArrayList<Integer>> buildNonessentials(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
         for (Constraint c : constraints) {
             for (Cell cell : c.getVariables()) {
-                ArrayList<Integer> domain = cell.getDomain();
-                if (domain.size() < 9) {
+                DomainSet domain = cell.getDomain();
+                if (domain.domainSize() < 9) {
                     for (int n = 1; n < 10; n++) {
+                        System.out.println(cell.getDomain().toString());
                         if (!domain.contains(n)) {
-                            addNonEssential(nonessential, "cell_" + cell.getY() + "_" + cell.getX(), n);
+                            System.out.println("adding ne: " + n + " " + cell.getX() + cell.getY());
+                            addNonEssential(nonessential, "cell_" + cell.getX() + "_" + cell.getY(), n);
                         }
                     }
                 }
@@ -152,10 +154,11 @@ public class Util {
     public static boolean reduceFromNE(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
         for(String s: nonessential.keySet()) {
             String[] info = s.split("_");
-            String y=info[1];
-            String x=info[2];
+            String x = info[1];
+            String y = info[2];
+
             for (Constraint constraint : constraints) {
-                if(constraint.getName().contains(x+y) | constraint.getName().contains(x+"."+y)){ // only go through the constraint if it contains the cell
+                if(constraint.getName().contains(x + y) | constraint.getName().contains(x + "." + y)){ // only go through the constraint if it contains the cell
                     Cell[] cells = constraint.getVariables();
                     for(int j = 0; j < cells.length; j++) {
                         //if you've found the right cell
@@ -163,7 +166,7 @@ public class Util {
                             //pull the arraylist of nonessential values from the hash table
                             List<Integer> temp = nonessential.get(s);
                             //loop through the array list and remove each nonessential from the constraint and cell
-                            for(Integer assignment: temp){
+                            for(Integer assignment: temp) {
                                 constraint.removeAssignment(j, assignment);
                                 cells[j].removeDomainValue(assignment);
                             }

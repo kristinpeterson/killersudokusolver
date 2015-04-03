@@ -97,8 +97,9 @@ public class Cage {
 		for (Stack<Integer> stack : ps) {
 			while (!stack.empty()) {
 				Integer k = stack.pop();
+				DomainValue dv = new DomainValue(k);
 				for (Cell cell : cells) {
-					cell.addDomainValue(k);
+					cell.addDomainValue(dv);
 				}
 			}
 		}
