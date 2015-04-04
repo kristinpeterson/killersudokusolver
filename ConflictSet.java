@@ -22,6 +22,18 @@ public class ConflictSet {
         setStepAssigned(0);
     }
 
+    public boolean isEmpty(){
+        return variables.size() == 0;
+    }
+
+    public boolean contains(Cell c){
+        return variables.contains(c);
+    }
+
+    public boolean remove(Cell c){
+        return variables.remove(c);
+    }
+
     /**
      * Sets the list of variables for the conflict set
      *

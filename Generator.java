@@ -16,8 +16,8 @@ public class Generator{
 
 	private ArrayList<Constraint> filters;
 	private Cell variable;
-	DomainValue workingHypothesis;
-	Integer assignCount;	//counts the number of assignments that the generator has made to its variable
+	private DomainValue workingHypothesis;
+	private Integer assignCount;	//counts the number of assignments that the generator has made to its variable
 
 	/**
 	 * Constructor for the generator, sets the variable
@@ -36,6 +36,15 @@ public class Generator{
             }
         }
         setAssignCount(0);
+	}
+
+	/**
+	 * Return the filters for the generator
+	 *
+	 * @return the filters for the generator
+	 */
+	public ArrayList<Constraint> getFilters(){
+		return filters;
 	}
 
 	/**

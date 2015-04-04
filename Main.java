@@ -27,6 +27,8 @@ public class Main {
 
 	static Board board = new Board();
 
+	static final Integer MAX_DEPTH = 80;
+
 	public static void main(String[] argv) throws Exception {
 		/** Get cages from file */
 		try {
@@ -66,6 +68,14 @@ public class Main {
 		// Milestone 2: order cells in ascending-domain-size order and print results to m2output.txt
 		board.orderCellsAscending();
 		Util.printM2Output();
+
+		// Milestone 3: solve...
+		Generator[] generators = new Generator[81];
+		List<Cell> cells = board.getCells();
+		for( int i=0; i<cells.size(); i++){
+			generators[i] = new Generator(cells.get(i));
+		}
+
 	}
 
 	/**

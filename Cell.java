@@ -138,6 +138,22 @@ public class Cell {
 		return this.domain;
 	}
 
+	public DomainValue getValue(){
+		return value;
+	}
+
+	public void setValue(DomainValue dv){
+		value = dv;
+	}
+
+	public Integer getLastAssigned(){
+		return last_assigned;
+	}
+
+	public void setLastAssigned(Integer count){
+		last_assigned = count;
+	}
+
 	/**
 	 * Sets which nonet this cell would be in
 	 *  1 2 3

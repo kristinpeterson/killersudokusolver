@@ -107,6 +107,90 @@ public class Util {
         }
     }
 
+    //Try to assign the variable at curr_depth to a consistent value
+    public static ConflictSet extendAssignment(Generator[] generators, Integer step_count, Integer curr_depth) {
+        Generator g = generators[curr_depth];
+        g.setAssignCount(0);
+        while(assign_variable(g, step_count, curr_depth) == true){
+            if(curr_depth == Main.MAX_DEPTH){
+                //record solution(generator)
+                return new ConflictSet();
+            } else {
+                ConflictSet cs = extendAssignment(generators, step_count, curr_depth+1);
+                if(cs.isEmpty())
+                    return cs;
+                if(!cs.contains(g.getVariable())){ //conflict set contains the Cell  //BACKJUMP?
+                    //g.setWorkingHypothesis() g.variable.value
+                    return cs;
+                } else {
+                    cs.remove(g.getVariable());
+                    cs.setStepAssigned(step_count);
+                    //g.variable.domain_value.conflict_set = cs;
+                }
+                return cs;
+            }
+        }
+        //return the union of the conflict sets associated with each domain value of the cell
+        return new ConflictSet();
+    }
+
+    //return true if a value can be assigned to generator
+    public static boolean assign_variable(Generator g, Integer step_count, Integer curr_depth){
+        DomainValue dv = select_next_assignment(g);
+        ConflictSet cs;
+
+        while(!dv.equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
+            step_count++;
+            cs = filterCurrentAssignment(g.getFilters(), curr_depth);
+            dv.setConflictSet(cs);
+            if(cs.isEmpty()){
+                return true;
+            } else {
+                cs.setStepAssigned(step_count);
+            }
+        }
+        return false; //all domain values tried and nothing consistent found
+    }
+
+    public static ConflictSet filterCurrentAssignment(ArrayList<Constraint> filters, Integer curr_depth){
+        FilterTable ft;
+        for(Constraint c: filters){
+            //ft = c.getFilterTables();
+        }
+        return new ConflictSet();
+    }
+
+    public static boolean hasRecentlyReassignedVariable(ConflictSet cs){
+        if(cs == null)
+            return true;
+
+        for(Cell c: cs.getVariables()){
+            if(c.getLastAssigned() > cs.getStepAssigned())
+                return true;
+        }
+
+        return false;
+    }
+
+    public static DomainValue select_next_assignment(Generator g){
+        Cell variable = g.getVariable();
+        int assignCount = g.getAssignCount();
+        if (assignCount == variable.getDomain().getDomainValues().size())
+            return new DomainValue(0);
+
+        assignCount++;
+        g.setAssignCount(assignCount);
+        DomainValue dv = g.getWorkingHypothesis();
+        if(dv != null && hasRecentlyReassignedVariable(dv.getConflictSet())) /// TODO figure out tebert logic here assigncount would never be 0...
+            return dv;
+
+        //TODO ... 
+        //else Randomly choose a domain value 
+
+
+        return dv;
+    }
+
     /**
      * Applies arc consistency on the given list of constraints
      *
