@@ -139,7 +139,7 @@ public class Util {
         DomainValue dv = select_next_assignment(g);
         ConflictSet cs;
 
-        while(!dv.equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
+        while(dv!=null && !dv.equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
             step_count++;
             cs = filterCurrentAssignment(g.getFilters(), curr_depth);
             dv.setConflictSet(cs);
@@ -155,7 +155,7 @@ public class Util {
     public static ConflictSet filterCurrentAssignment(ArrayList<Constraint> filters, Integer curr_depth){
         FilterTable ft;
         for(Constraint c: filters){
-            //ft = c.getFilterTables();
+            ft = c.getFilterTableByDepth(curr_depth);
         }
         return new ConflictSet();
     }

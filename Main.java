@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.Hashtable;
 
 /**
  * COURSE: CECS-551 AI
@@ -71,10 +72,18 @@ public class Main {
 
 		// Milestone 3: solve...
 		Generator[] generators = new Generator[81];
+		Hashtable<String, Integer> generator_map = new Hashtable<String, Integer>();
 		List<Cell> cells = board.getCells();
 		for( int i=0; i<cells.size(); i++){
 			generators[i] = new Generator(cells.get(i));
+			generator_map.put( ""+ cells.get(i).getX()+ cells.get(i).getY(), new Integer(i));
 		}
+
+		for(Constraint c: board.getConstraints()){
+			c.constructFilterTables(generator_map);
+		}
+
+		Util.extendAssignment(generators, 1, 0);
 
 	}
 

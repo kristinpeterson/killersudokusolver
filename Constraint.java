@@ -1,6 +1,7 @@
 package killersudokusolver;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 /**
  * COURSE: CECS-551 AI
@@ -21,6 +22,7 @@ public class Constraint {
     private ArrayList<ArrayList<Integer>> satisfyingAssignments;
     public final int initialSatisfyingAssignmentSize; // initial number of satisfying assignments
     private ArrayList<FilterTable> filterTables;
+    private FilterTable ft;
 
     /**
      * Constraint constructor, sets the constraints name,
@@ -37,7 +39,9 @@ public class Constraint {
         setVariables(variables);
         setSatisfyingAssignments(satisfyingAssignments);
         initialSatisfyingAssignmentSize = satisfyingAssignments.size();
-        filterTables = new ArrayList<FilterTable>();
+        filterTables = new ArrayList<FilterTable>(81);
+        for(int i=0; i<81; i++)
+            filterTables.add(new FilterTable());
     }
 
     /**
@@ -51,6 +55,56 @@ public class Constraint {
             copyCells[i] = variables[i].getDeepCopy();
         }
         return new Constraint(this.getName(), copyCells, this.getSatisfyingAssignmentsDeepCopy());
+    }
+
+    public void constructFilterTables(Hashtable<String, Integer> generator_map){
+        Cell[] vars_new_order = new Cell[variables.length];
+        int[] vars_indices = new int[variables.length];
+        int index = 0; // variable to keep track of how full vars_ arrays are
+        int[] depths= new int[variables.length]; // keep track of generator depths
+        int min_depth = 81; //used to search and order variables
+        int done_depth = 0;
+        for (int i=0; i<variables.length ; i++) {
+            int depth = generator_map.get(""+variables[i].getX()+variables[i].getY());
+            depths[i] = depth;
+            if(min_depth > depth)
+                min_depth = depth;
+        }
+        //prep structures for filter table
+        while(min_depth<81) {
+            for (int i=0; i<variables.length ; i++) {
+                if(depths[i] == min_depth){
+                    vars_new_order[index] = variables[i]; //keep track of the order of the variables depth
+                    vars_indices[index] = i;
+                    done_depth = depths[i]; //erase this depth from the record so we can search for next lowest
+                    min_depth = 81; //reset min_depth
+                }
+            }
+            //find next lowest depth
+            for (int j=0; j<variables.length ; j++) {
+                if(min_depth > depths[j] && depths[j] > done_depth)
+                    min_depth = depths[j];
+            }
+        }
+
+        //make filter tables
+        ArrayList<Cell> filter_variables = new ArrayList<Cell>();
+        for (int k=0; k<variables.length; k++ ) {
+            FilterTable ft = new FilterTable();
+            Hashtable<String, Integer> table = new Hashtable<String, Integer>();
+            filter_variables.add(vars_new_order[k]);
+            ft.setVariables(filter_variables);
+            for(ArrayList<Integer> sa: satisfyingAssignments){
+                StringBuilder s = new StringBuilder();
+                for (int j=0; j<=k; j++) {
+                    s.append(sa.get(vars_indices[j]));
+                }
+                System.out.println("s.toString "+s.toString());
+                table.put(s.toString(), new Integer(0)); //just need to test for presence of the string
+            }
+            ft.setTable(table);
+            filterTables.add(depths[k], ft);
+        }
     }
 
     /**
@@ -69,6 +123,15 @@ public class Constraint {
      */
     public ArrayList<FilterTable> getFilterTables() {
         return filterTables;
+    }
+
+        /**
+     * Returns the list of filter tables
+     *
+     * @return the list of filter tables
+     */
+    public FilterTable getFilterTableByDepth(int depth) {
+        return filterTables.get(depth);
     }
 
     /**
