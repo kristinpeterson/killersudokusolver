@@ -74,7 +74,7 @@ public class Main {
 		Generator[] generators = new Generator[81];
 		Hashtable<String, Integer> generator_map = new Hashtable<String, Integer>();
 		List<Cell> cells = board.getCells();
-		for( int i=0; i<cells.size(); i++){
+		for(int i = 0; i < cells.size(); i++){
 			generators[i] = new Generator(cells.get(i));
 			generator_map.put( ""+ cells.get(i).getX()+ cells.get(i).getY(), new Integer(i));
 		}

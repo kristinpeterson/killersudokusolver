@@ -99,7 +99,6 @@ public class Constraint {
                 for (int j=0; j<=k; j++) {
                     s.append(sa.get(vars_indices[j]));
                 }
-                System.out.println("s.toString "+s.toString());
                 table.put(s.toString(), new Integer(0)); //just need to test for presence of the string
             }
             ft.setTable(table);

@@ -3,9 +3,7 @@ package killersudokusolver;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 /**
  * COURSE: CECS-551 AI
@@ -109,23 +107,24 @@ public class Util {
 
     //Try to assign the variable at curr_depth to a consistent value
     public static ConflictSet extendAssignment(Generator[] generators, Integer step_count, Integer curr_depth) {
-        Generator g = generators[curr_depth];
-        g.setAssignCount(0);
+        Generator g = generators[curr_depth];   // g is the Generator for the current depth
+        g.setAssignCount(0); // g has yet to assign its variable to any of the domain values
         while(assign_variable(g, step_count, curr_depth) == true){
             if(curr_depth == Main.MAX_DEPTH){
-                //record solution(generator)
+                recordSolution(generators);
                 return new ConflictSet();
             } else {
-                ConflictSet cs = extendAssignment(generators, step_count, curr_depth+1);
+                //pass control down to the next generator
+                ConflictSet cs = extendAssignment(generators, step_count, curr_depth + 1);
                 if(cs.isEmpty())
                     return cs;
-                if(!cs.contains(g.getVariable())){ //conflict set contains the Cell  //BACKJUMP?
-                    //g.setWorkingHypothesis() g.variable.value
+                if(!cs.contains(g.getVariable())){ //conflict set *does not* contains the Cell  //BACKJUMP?
+                    g.setWorkingHypothesis(g.getVariable().getValue());
                     return cs;
                 } else {
                     cs.remove(g.getVariable());
                     cs.setStepAssigned(step_count);
-                    //g.variable.domain_value.conflict_set = cs;
+                    g.getVariable().getValue().setConflictSet(cs);
                 }
                 return cs;
             }
@@ -139,9 +138,10 @@ public class Util {
         DomainValue dv = select_next_assignment(g);
         ConflictSet cs;
 
-        while(dv!=null && !dv.equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
+        while(!dv.equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
             step_count++;
-            cs = filterCurrentAssignment(g.getFilters(), curr_depth);
+            System.out.println(step_count);
+            cs = filterCurrentAssignment(g.getFilters(), curr_depth, dv);
             dv.setConflictSet(cs);
             if(cs.isEmpty()){
                 return true;
@@ -152,16 +152,20 @@ public class Util {
         return false; //all domain values tried and nothing consistent found
     }
 
-    public static ConflictSet filterCurrentAssignment(ArrayList<Constraint> filters, Integer curr_depth){
+    public static ConflictSet filterCurrentAssignment(ArrayList<Constraint> filters, Integer curr_depth,
+                                                      DomainValue currentAssignment){
         FilterTable ft;
-        for(Constraint c: filters){
+        for(Constraint c: filters) {
             ft = c.getFilterTableByDepth(curr_depth);
+            if (!ft.getTable().contains(currentAssignment)) {
+                return new ConflictSet(ft.getVariables());
+            }
         }
         return new ConflictSet();
     }
 
     public static boolean hasRecentlyReassignedVariable(ConflictSet cs){
-        if(cs == null)
+        if(cs == null || cs.isEmpty())
             return true;
 
         for(Cell c: cs.getVariables()){
@@ -174,20 +178,28 @@ public class Util {
 
     public static DomainValue select_next_assignment(Generator g){
         Cell variable = g.getVariable();
-        int assignCount = g.getAssignCount();
-        if (assignCount == variable.getDomain().getDomainValues().size())
+        if (g.getAssignCount() == variable.getDomain().getDomainValues().size())
             return new DomainValue(0);
 
-        assignCount++;
-        g.setAssignCount(assignCount);
+        g.incrementAssignCount();
         DomainValue dv = g.getWorkingHypothesis();
-        if(dv != null && hasRecentlyReassignedVariable(dv.getConflictSet())) /// TODO figure out tebert logic here assigncount would never be 0...
+
+        if(g.getAssignCount() == 0 && dv != null && hasRecentlyReassignedVariable(dv.getConflictSet()))
             return dv;
 
-        //TODO ... 
-        //else Randomly choose a domain value 
+        // Create list of DomainValue candidates that have been recently assigned
+        ArrayList<DomainValue> dvCandidates = new ArrayList<DomainValue>();
+        for(DomainValue dvCandidate : g.getVariable().getDomain().getDomainValues()) {
+            if(hasRecentlyReassignedVariable(dvCandidate.getConflictSet())) {
+                dvCandidates.add(dvCandidate);
+            }
+        }
 
-
+        // Choose a random DomainValue from the dvCandidates list
+        Random rng = new Random(new Date().getTime());
+        int randomIndex = rng.nextInt(dvCandidates.size());
+        dv = dvCandidates.get(randomIndex);
+        g.getVariable().setValue(dv);
         return dv;
     }
 
@@ -289,5 +301,12 @@ public class Util {
 
         // Put the temp list into the nonessential values list
         nonessential.put(ne, temp);
+    }
+
+    public static void recordSolution(Generator[] generators) {
+        System.out.println("SOLUTION FOUND!");
+        for(Generator g : generators) {
+            System.out.println(g.getVariable() + " : " + g.getWorkingHypothesis());
+        }
     }
 }

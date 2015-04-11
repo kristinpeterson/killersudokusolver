@@ -22,6 +22,11 @@ public class ConflictSet {
         setStepAssigned(0);
     }
 
+    public ConflictSet(ArrayList<Cell> variables) {
+        setVariables(variables);
+        setStepAssigned(0);
+    }
+
     public boolean isEmpty(){
         return variables.size() == 0;
     }
