@@ -306,7 +306,7 @@ public class Util {
     public static void recordSolution(Generator[] generators) {
         System.out.println("SOLUTION FOUND!");
         for(Generator g : generators) {
-            System.out.println(g.getVariable() + " : " + g.getWorkingHypothesis());
+            System.out.println(g.getVariable() + " : " + g.getVariable().getValue());
         }
     }
 }

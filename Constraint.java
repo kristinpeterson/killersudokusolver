@@ -22,7 +22,6 @@ public class Constraint {
     private ArrayList<ArrayList<Integer>> satisfyingAssignments;
     public final int initialSatisfyingAssignmentSize; // initial number of satisfying assignments
     private ArrayList<FilterTable> filterTables;
-    private FilterTable ft;
 
     /**
      * Constraint constructor, sets the constraints name,
@@ -78,6 +77,7 @@ public class Constraint {
                     vars_indices[index] = i;
                     done_depth = depths[i]; //erase this depth from the record so we can search for next lowest
                     min_depth = 81; //reset min_depth
+                    index++;
                 }
             }
             //find next lowest depth
@@ -93,18 +93,13 @@ public class Constraint {
             FilterTable ft = new FilterTable();
             Hashtable<String, Integer> table = new Hashtable<String, Integer>();
 
-            // Make sure no null values get added to filter_variables
-            if(vars_new_order[k] != null) {
-                filter_variables.add(vars_new_order[k]);
-            }
-
             ft.setVariables(filter_variables);
             for(ArrayList<Integer> sa: satisfyingAssignments){
                 StringBuilder s = new StringBuilder();
                 for (int j=0; j<=k; j++) {
                     s.append(sa.get(vars_indices[j]));
                 }
-                table.put(s.toString(), new Integer(0)); //just need to test for presence of the string
+                table.put(s.toString(), 0); //just need to test for presence of the string
             }
             ft.setTable(table);
             filterTables.add(depths[k], ft);
@@ -112,27 +107,9 @@ public class Constraint {
     }
 
     /**
-     * Sets the list of filter tables
+     * Returns the filter table for the given depth
      *
-     * @param filterTables the list of filter tables to set
-     */
-    public void setFilterTable(ArrayList<FilterTable> filterTables) {
-        this.filterTables = filterTables;
-    }
-
-    /**
-     * Returns the list of filter tables
-     *
-     * @return the list of filter tables
-     */
-    public ArrayList<FilterTable> getFilterTables() {
-        return filterTables;
-    }
-
-        /**
-     * Returns the list of filter tables
-     *
-     * @return the list of filter tables
+     * @return the filter table for the given depth
      */
     public FilterTable getFilterTableByDepth(int depth) {
         return filterTables.get(depth);
