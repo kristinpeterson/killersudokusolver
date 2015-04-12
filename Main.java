@@ -28,6 +28,9 @@ public class Main {
 
 	static Board board = new Board();
 
+	static Hashtable<String, Integer> generator_map = new Hashtable<String, Integer>();
+	static Generator[] generators = new Generator[81];
+
 	static final Integer MAX_DEPTH = 80;
 
 	public static void main(String[] argv) throws Exception {
@@ -71,8 +74,8 @@ public class Main {
 		Util.printM2Output();
 
 		// Milestone 3: solve...
-		Generator[] generators = new Generator[81];
-		Hashtable<String, Integer> generator_map = new Hashtable<String, Integer>();
+		generators = new Generator[81];
+		generator_map = new Hashtable<String, Integer>();
 		List<Cell> cells = board.getCells();
 		for(int i = 0; i < cells.size(); i++){
 			generators[i] = new Generator(cells.get(i));

@@ -49,6 +49,26 @@ public class ConflictSet {
     }
 
     /**
+     * Adds the list of variables to the conflict set variable list
+     *
+     * @param variables the list of variables to add
+     */
+    public void addVariables(ArrayList<Cell> vars) {
+        for(Cell c: vars){
+            boolean found = false;
+            for(Cell c2: variables){
+                if(c2.equals(c)){
+                    found = true;
+                }
+            }
+            if(!found){
+                variables.add(c);
+                found = false;
+            }
+        }
+    }
+
+    /**
      * Returns the list of variables for the conflict set
      *
      * @return the list of variables for the conflict set
@@ -88,5 +108,13 @@ public class ConflictSet {
                     return true;
         }
         return false;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Step Assigned: "+stepAssigned+"\n");
+        for (int i=0; i<variables.size(); i++) {
+            sb.append("Variable "+i+variables.get(i)+"\n");
+        }
+        return sb.toString();
     }
 }

@@ -110,16 +110,18 @@ public class Util {
     public static ConflictSet extendAssignment(Generator[] generators, Integer step_count, Integer curr_depth) {
         Generator g = generators[curr_depth];   // g is the Generator for the current depth
         g.setAssignCount(0); // g has yet to assign its variable to any of the domain values
+        ConflictSet cs = new ConflictSet();
         while(assign_variable(g, step_count, curr_depth) == true){
             if(curr_depth == Main.MAX_DEPTH){
                 recordSolution(generators);
                 return new ConflictSet();
             } else {
                 //pass control down to the next generator
-                ConflictSet cs = extendAssignment(generators, step_count, curr_depth + 1);
+                cs = extendAssignment(generators, step_count, curr_depth + 1);
                 if(cs.isEmpty())
                     return cs;
                 if(!cs.contains(g.getVariable())){ //conflict set *does not* contains the Cell  //BACKJUMP?
+                    System.out.println("DO I EVER SET A hypothesis????? ");
                     g.setWorkingHypothesis(g.getVariable().getValue());
                     return cs;
                 } else {
@@ -127,11 +129,10 @@ public class Util {
                     cs.setStepAssigned(step_count);
                     g.getVariable().getValue().setConflictSet(cs);
                 }
-                return cs;
             }
         }
         //return the union of the conflict sets associated with each domain value of the cell
-        return new ConflictSet();
+        return cs;
     }
 
     //return true if a value can be assigned to generator
@@ -144,6 +145,7 @@ public class Util {
             cs = filterCurrentAssignment(g.getFilters(), curr_depth, dv);
             dv.setConflictSet(cs);
             if(cs.isEmpty()){
+                g.setWorkingHypothesis(dv); //TODO set a working hypothesis somewhere
                 return true;
             } else {
                 cs.setStepAssigned(step_count);
@@ -154,14 +156,33 @@ public class Util {
 
     public static ConflictSet filterCurrentAssignment(ArrayList<Constraint> filters, Integer curr_depth,
                                                       DomainValue currentAssignment){
-        FilterTable ft;
+        ConflictSet cs = new ConflictSet();
+
         for(Constraint c: filters) {
+            FilterTable ft;
+            ArrayList<Integer> gen_depths = new ArrayList<Integer>(); //keep track of related variables depths
             ft = c.getFilterTableByDepth(curr_depth);
-            if (!ft.getTable().contains(currentAssignment)) {
-                return new ConflictSet(ft.getVariables());
+            StringBuilder key = new StringBuilder();
+
+            for (Cell v: c.getVariables()) { //find the depths of all related variables
+                String depth_key = ""+ v.getX()+ v.getY();
+                if(!gen_depths.contains(Main.generator_map.get(depth_key)))
+                    gen_depths.add(Main.generator_map.get(depth_key));
+            }
+            sort(gen_depths);
+
+            for(int i: gen_depths){
+                DomainValue hypothesis = Main.generators[i].getWorkingHypothesis();
+                if(i < curr_depth && hypothesis != null){
+                    key.append(hypothesis.getDomainValue()); //append working hypothesis of generators above to key
+                }
+            }
+            key.append(currentAssignment.getDomainValue());
+            if (!ft.getTable().containsKey(key.toString())) {
+                cs.addVariables(ft.getVariables()); //Add all variables that might conflict to the conflict set
             }
         }
-        return new ConflictSet();
+        return cs; 
     }
 
     public static boolean hasRecentlyReassignedVariable(ConflictSet cs){
@@ -200,6 +221,7 @@ public class Util {
         int randomIndex = rng.nextInt(dvCandidates.size());
         dv = dvCandidates.get(randomIndex);
         g.getVariable().setValue(dv);
+        g.setWorkingHypothesis(dv); //TODO set hypothesis somewhere
         return dv;
     }
 
@@ -307,6 +329,19 @@ public class Util {
         System.out.println("SOLUTION FOUND!");
         for(Generator g : generators) {
             System.out.println(g.getVariable() + " : " + g.getVariable().getValue());
+        }
+    }
+
+    public static void sort(ArrayList<Integer> list){
+        int[] array = new int[list.size()];
+        int index = 0;
+        for(Object o: list.toArray()){
+            array[index++] = ((Integer)o).intValue();
+        }
+        Arrays.sort(array);
+        index = 0;
+        for(int i: array){
+            list.set(index++, new Integer(i));
         }
     }
 }

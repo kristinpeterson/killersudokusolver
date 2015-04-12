@@ -1,6 +1,7 @@
 package killersudokusolver;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * COURSE: CECS-551 AI
@@ -49,6 +50,17 @@ public class DomainSet {
      */
     public ArrayList<DomainValue> getDomainValues() {
         return domainValues;
+    }
+
+    /**
+     * Returns a random domain value from the set list
+     *
+     * @return a domain value 
+     */
+    public DomainValue getRandomDomainValue() {
+        Random rand = new Random();
+        int index = rand.nextInt(domainValues.size());
+        return domainValues.get(index);
     }
 
     /**

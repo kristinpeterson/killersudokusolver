@@ -102,7 +102,13 @@ public class Constraint {
                 table.put(s.toString(), 0); //just need to test for presence of the string
             }
             ft.setTable(table);
-            filterTables.add(depths[k], ft);
+            
+            for(int j=0; j<=k; j++){
+                filter_variables.add(variables[vars_indices[j]]);
+            }
+
+            ft.setVariables(filter_variables);
+            filterTables.set(depths[k], ft);
         }
     }
 
