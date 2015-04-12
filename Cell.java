@@ -29,6 +29,7 @@ public class Cell {
 	 * Cell constructor, sets x and y values based on given
 	 * int parameters.
 	 * Initializes empty domain list.
+	 * x and y values are from 1..9
 	 *
 	 * @param x the cells x value (row)
 	 * @param y the cells y value (column)
@@ -45,7 +46,7 @@ public class Cell {
 	 * Cell constructor, sets x and y values based on given
 	 * string parameters.
 	 * Initializes empty domain list.
-	 * Sets initial value to -1 as a flag that the value has not yet been set.
+	 * x and y values are from 1..9
 	 *
 	 * @param xs string representation of the cells x value
 	 * @param ys string representation of the cells y value

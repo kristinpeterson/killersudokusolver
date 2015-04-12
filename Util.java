@@ -136,7 +136,7 @@ public class Util {
     }
 
     //return true if a value can be assigned to generator
-    public static boolean assign_variable(Generator g, Integer step_count, Integer curr_depth){
+    private static boolean assign_variable(Generator g, Integer step_count, Integer curr_depth){
         DomainValue dv;
         ConflictSet cs;
 
@@ -154,7 +154,7 @@ public class Util {
         return false; //all domain values tried and nothing consistent found
     }
 
-    public static ConflictSet filterCurrentAssignment(ArrayList<Constraint> filters, Integer curr_depth,
+    private static ConflictSet filterCurrentAssignment(ArrayList<Constraint> filters, Integer curr_depth,
                                                       DomainValue currentAssignment){
         ConflictSet cs = new ConflictSet();
 
@@ -187,7 +187,7 @@ public class Util {
         return cs; 
     }
 
-    public static boolean hasRecentlyReassignedVariable(ConflictSet cs){
+    private static boolean hasRecentlyReassignedVariable(ConflictSet cs){
         if(cs == null || cs.isEmpty())
             return true;
 
@@ -199,7 +199,7 @@ public class Util {
         return false;
     }
 
-    public static DomainValue select_next_assignment(Generator g){
+    private static DomainValue select_next_assignment(Generator g){
         Cell variable = g.getVariable();
         if (g.getAssignCount() == variable.getDomain().getDomainValues().size())
             return new DomainValue(0);
@@ -269,7 +269,7 @@ public class Util {
      * @param constraints the constraints from which non-essential assignments are being removed
      * @return false if any of the constraints satisfying assignment lists are reduced to zero
      */
-    public static boolean reduceFromNE(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
+    private static boolean reduceFromNE(Hashtable<String, ArrayList<Integer>> nonessential, List<Constraint> constraints) {
         for(String s: nonessential.keySet()) {
             String[] info = s.split("_");
             String x = info[1];
@@ -311,7 +311,7 @@ public class Util {
      *           nonessential list hash
      * @param val the nonessential value to add
      */
-    public static void addNonEssential(Hashtable<String, ArrayList<Integer>> nonessential, String ne, int val){
+    private static void addNonEssential(Hashtable<String, ArrayList<Integer>> nonessential, String ne, int val){
         ArrayList<Integer> temp = new ArrayList<Integer>();
 
         // If nonessential list already has a value for the given ne key string
@@ -327,11 +327,47 @@ public class Util {
         nonessential.put(ne, temp);
     }
 
-    public static void recordSolution(Generator[] generators) {
+    private static void recordSolution(Generator[] generators) {
         System.out.println("SOLUTION FOUND!");
+        printSolutionBoard(generators);
         for(Generator g : generators) {
             System.out.println(g.getVariable() + " : " + g.getVariable().getValue());
         }
+    }
+
+    private static void printSolutionBoard(Generator[] generators) {
+        int[][] solution = new int[9][9];
+        for(Generator g : generators) {
+            Cell cell = g.getVariable();
+            switch(cell.getY()) {
+                case 1: solution[0][cell.getX()-1] = cell.getValue().getDomainValue();
+                    break;
+                case 2: solution[1][cell.getX()-1] = cell.getValue().getDomainValue();
+                    break;
+                case 3: solution[2][cell.getX()-1] = cell.getValue().getDomainValue();
+                    break;
+                case 4: solution[3][cell.getX()-1] = cell.getValue().getDomainValue();
+                    break;
+                case 5: solution[4][cell.getX()-1] = cell.getValue().getDomainValue();
+                    break;
+                case 6: solution[5][cell.getX()-1] = cell.getValue().getDomainValue();
+                    break;
+                case 7: solution[6][cell.getX()-1] = cell.getValue().getDomainValue();
+                    break;
+                case 8: solution[7][cell.getX()-1] = cell.getValue().getDomainValue();
+                    break;
+                case 9: solution[8][cell.getX()-1] = cell.getValue().getDomainValue();
+                    break;
+            }
+        }
+        System.out.println();
+        for(int i = 0; i < 9; i++) {
+            for(int j = 0; j < 9; j++) {
+                System.out.print(solution[i][j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 
     public static void sort(ArrayList<Integer> list){
