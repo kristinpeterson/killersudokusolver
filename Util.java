@@ -169,8 +169,9 @@ public class Util {
                 if(!gen_depths.contains(Main.generator_map.get(depth_key)))
                     gen_depths.add(Main.generator_map.get(depth_key));
             }
-            sort(gen_depths);
 
+            Collections.sort(gen_depths);
+            
             for(int i: gen_depths){
                 DomainValue hypothesis = Main.generators[i].getWorkingHypothesis();
                 if(i < curr_depth && hypothesis != null){
@@ -368,18 +369,5 @@ public class Util {
             System.out.println();
         }
         System.out.println();
-    }
-
-    public static void sort(ArrayList<Integer> list){
-        int[] array = new int[list.size()];
-        int index = 0;
-        for(Object o: list.toArray()){
-            array[index++] = ((Integer)o).intValue();
-        }
-        Arrays.sort(array);
-        index = 0;
-        for(int i: array){
-            list.set(index++, new Integer(i));
-        }
     }
 }
