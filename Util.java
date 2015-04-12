@@ -3,6 +3,7 @@ package killersudokusolver;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -135,12 +136,11 @@ public class Util {
 
     //return true if a value can be assigned to generator
     public static boolean assign_variable(Generator g, Integer step_count, Integer curr_depth){
-        DomainValue dv = select_next_assignment(g);
+        DomainValue dv;
         ConflictSet cs;
 
-        while(!dv.equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
+        while(!(dv = select_next_assignment(g)).equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
             step_count++;
-            System.out.println(step_count);
             cs = filterCurrentAssignment(g.getFilters(), curr_depth, dv);
             dv.setConflictSet(cs);
             if(cs.isEmpty()){

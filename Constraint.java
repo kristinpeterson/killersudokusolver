@@ -61,18 +61,18 @@ public class Constraint {
         Cell[] vars_new_order = new Cell[variables.length];
         int[] vars_indices = new int[variables.length];
         int index = 0; // variable to keep track of how full vars_ arrays are
-        int[] depths= new int[variables.length]; // keep track of generator depths
+        int[] depths = new int[variables.length]; // keep track of generator depths
         int min_depth = 81; //used to search and order variables
         int done_depth = 0;
-        for (int i=0; i<variables.length ; i++) {
+        for (int i = 0; i < variables.length; i++) {
             int depth = generator_map.get(""+variables[i].getX()+variables[i].getY());
             depths[i] = depth;
             if(min_depth > depth)
                 min_depth = depth;
         }
         //prep structures for filter table
-        while(min_depth<81) {
-            for (int i=0; i<variables.length ; i++) {
+        while(min_depth < 81) {
+            for (int i = 0; i < variables.length; i++) {
                 if(depths[i] == min_depth){
                     vars_new_order[index] = variables[i]; //keep track of the order of the variables depth
                     vars_indices[index] = i;
@@ -81,7 +81,7 @@ public class Constraint {
                 }
             }
             //find next lowest depth
-            for (int j=0; j<variables.length ; j++) {
+            for (int j = 0; j < variables.length; j++) {
                 if(min_depth > depths[j] && depths[j] > done_depth)
                     min_depth = depths[j];
             }
@@ -89,10 +89,15 @@ public class Constraint {
 
         //make filter tables
         ArrayList<Cell> filter_variables = new ArrayList<Cell>();
-        for (int k=0; k<variables.length; k++ ) {
+        for (int k = 0; k < variables.length; k++) {
             FilterTable ft = new FilterTable();
             Hashtable<String, Integer> table = new Hashtable<String, Integer>();
-            filter_variables.add(vars_new_order[k]);
+
+            // Make sure no null values get added to filter_variables
+            if(vars_new_order[k] != null) {
+                filter_variables.add(vars_new_order[k]);
+            }
+
             ft.setVariables(filter_variables);
             for(ArrayList<Integer> sa: satisfyingAssignments){
                 StringBuilder s = new StringBuilder();

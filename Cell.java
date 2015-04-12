@@ -38,6 +38,7 @@ public class Cell {
 		this.y = y;
 		this.domain = new DomainSet();
 		this.nonet = setNonet();
+		setLastAssigned(0);
 	}
 
 	/**
@@ -54,6 +55,7 @@ public class Cell {
 		this.y = Integer.parseInt(ys);
 		this.domain = new DomainSet();
 		this.nonet = setNonet();
+		setLastAssigned(0);
 	}
 
 	/**
