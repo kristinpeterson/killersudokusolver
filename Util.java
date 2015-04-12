@@ -180,6 +180,8 @@ public class Util {
             key.append(currentAssignment.getDomainValue());
             if (!ft.getTable().containsKey(key.toString())) {
                 cs.addVariables(ft.getVariables()); //Add all variables that might conflict to the conflict set
+            } else {
+                return cs;
             }
         }
         return cs; 
