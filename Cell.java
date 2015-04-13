@@ -23,6 +23,7 @@ public class Cell {
 	// used during forward checking / backtracking
 	private DomainValue value;	//currently assigned value
 	private Integer last_assigned;  //step that this variable was last assigned
+	private int depthAssigned;
 
 
 	/**
@@ -40,6 +41,7 @@ public class Cell {
 		this.domain = new DomainSet();
 		this.nonet = setNonet();
 		setLastAssigned(0);
+		setValue(new DomainValue(0));
 	}
 
 	/**
@@ -57,6 +59,7 @@ public class Cell {
 		this.domain = new DomainSet();
 		this.nonet = setNonet();
 		setLastAssigned(0);
+		setValue(new DomainValue(0));
 	}
 
 	/**
@@ -155,6 +158,14 @@ public class Cell {
 
 	public void setLastAssigned(Integer count){
 		last_assigned = count;
+	}
+
+	public void setDepthAssigned(int depthAssigned) {
+		this.depthAssigned = depthAssigned;
+	}
+
+	public int getDepthAssigned() {
+		return this.depthAssigned;
 	}
 
 	/**

@@ -37,6 +37,15 @@ public class FilterTable {
     }
 
     /**
+     * Adds the given variable to the variables list
+     *
+     * @param variable Adds the given variable to the variables list
+     */
+    public void addVariable(Cell variable) {
+        this.variables.add(variable);
+    }
+
+    /**
      * Returns the filter table's variable list
      *
      * @return the filter table's variable list

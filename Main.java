@@ -25,13 +25,8 @@ public class Main {
 	static ArrayList<Constraint> colConstraints = new ArrayList<Constraint>();
 	static ArrayList<Constraint> nonetConstraints = new ArrayList<Constraint>();
 	static ArrayList<Constraint> cageConstraints = new ArrayList<Constraint>();
-
 	static Board board = new Board();
-
-	static Hashtable<String, Integer> generator_map = new Hashtable<String, Integer>();
 	static Generator[] generators = new Generator[81];
-
-	static final Integer MAX_DEPTH = 80;
 
 	public static void main(String[] argv) throws Exception {
 		/** Get cages from file */
@@ -75,19 +70,14 @@ public class Main {
 
 		// Milestone 3: solve...
 		generators = new Generator[81];
-		generator_map = new Hashtable<String, Integer>();
 		List<Cell> cells = board.getCells();
 		for(int i = 0; i < cells.size(); i++){
 			generators[i] = new Generator(cells.get(i));
-			generator_map.put( ""+ cells.get(i).getX()+ cells.get(i).getY(), new Integer(i));
 		}
-
 		for(Constraint c: board.getConstraints()){
-			c.constructFilterTables(generator_map);
+			c.constructFilterTables();
 		}
-
 		Util.extendAssignment(generators, 1, 0);
-
 	}
 
 	/**

@@ -51,19 +51,12 @@ public class ConflictSet {
     /**
      * Adds the list of variables to the conflict set variable list
      *
-     * @param variables the list of variables to add
+     * @param vars the list of variables to add
      */
     public void addVariables(ArrayList<Cell> vars) {
         for(Cell c: vars){
-            boolean found = false;
-            for(Cell c2: variables){
-                if(c2.equals(c)){
-                    found = true;
-                }
-            }
-            if(!found){
+            if(!variables.contains(c)) {
                 variables.add(c);
-                found = false;
             }
         }
     }

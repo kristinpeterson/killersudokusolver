@@ -1,6 +1,7 @@
 package killersudokusolver;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 
 /**
@@ -39,7 +40,7 @@ public class Constraint {
         setSatisfyingAssignments(satisfyingAssignments);
         initialSatisfyingAssignmentSize = satisfyingAssignments.size();
         filterTables = new ArrayList<FilterTable>(81);
-        for(int i=0; i<81; i++)
+        for(int i = 0; i < 81; i++)
             filterTables.add(new FilterTable());
     }
 
@@ -56,60 +57,44 @@ public class Constraint {
         return new Constraint(this.getName(), copyCells, this.getSatisfyingAssignmentsDeepCopy());
     }
 
-    public void constructFilterTables(Hashtable<String, Integer> generator_map){
-        Cell[] vars_new_order = new Cell[variables.length];
-        int[] vars_indices = new int[variables.length];
-        int index = 0; // variable to keep track of how full vars_ arrays are
-        int[] depths = new int[variables.length]; // keep track of generator depths
-        int min_depth = 81; //used to search and order variables
-        int done_depth = 0;
-        for (int i = 0; i < variables.length; i++) {
-            int depth = generator_map.get(""+variables[i].getX()+variables[i].getY());
-            depths[i] = depth;
-            if(min_depth > depth)
-                min_depth = depth;
-        }
-        //prep structures for filter table
-        while(min_depth < 81) {
-            for (int i = 0; i < variables.length; i++) {
-                if(depths[i] == min_depth){
-                    vars_new_order[index] = variables[i]; //keep track of the order of the variables depth
-                    vars_indices[index] = i;
-                    done_depth = depths[i]; //erase this depth from the record so we can search for next lowest
-                    min_depth = 81; //reset min_depth
-                    index++;
-                }
-            }
-            //find next lowest depth
-            for (int j = 0; j < variables.length; j++) {
-                if(min_depth > depths[j] && depths[j] > done_depth)
-                    min_depth = depths[j];
-            }
-        }
+    public void constructFilterTables(){
+        // Sort the constraints variables by depth (increasing order)
+        sortVariablesByDepth();
 
-        //make filter tables
-        ArrayList<Cell> filter_variables = new ArrayList<Cell>();
-        for (int k = 0; k < variables.length; k++) {
+        // Iterate over increasing depth ordered variables, and add filter tables
+        // for each depth
+        for(int i = 0; i < this.variables.length; i++) {
+            int depthAssigned = this.variables[i].getDepthAssigned();
             FilterTable ft = new FilterTable();
-            Hashtable<String, Integer> table = new Hashtable<String, Integer>();
 
-            ft.setVariables(filter_variables);
-            for(ArrayList<Integer> sa: satisfyingAssignments){
-                StringBuilder s = new StringBuilder();
-                for (int j=0; j<=k; j++) {
-                    s.append(sa.get(vars_indices[j]));
+            // add vars from smallest depth assigned (index 0) up to current depth (index i) to filter table
+            for(int j = 0; j <= i; j++) {
+                ft.addVariable(this.variables[j]);
+            }
+
+            // add satisfying assignments for the vars to the filter table's hashtable
+            for(ArrayList<Integer> satisfyingAssignment : satisfyingAssignments) {
+                StringBuilder sb = new StringBuilder();
+                for(int j = 0; j <= i; j++) {
+                    sb.append(satisfyingAssignment.get(j));
                 }
-                table.put(s.toString(), 0); //just need to test for presence of the string
-            }
-            ft.setTable(table);
-            
-            for(int j=0; j<=k; j++){
-                filter_variables.add(variables[vars_indices[j]]);
+                if(!ft.getTable().containsKey(sb.toString())) {
+                    ft.getTable().put(sb.toString(), 0);
+                }
             }
 
-            ft.setVariables(filter_variables);
-            filterTables.set(depths[k], ft);
+            // Add filter table for the current loop iterations depth to the filterTables list
+            filterTables.set(depthAssigned, ft);
         }
+
+        //TODO: remove this code, debug printing purposes only
+        //System.out.println(toString());
+        //System.out.println("table size: " + filterTables.size());
+        //for(int i = 0; i < filterTables.size(); i++) {
+        //    if(!filterTables.get(i).getVariables().isEmpty())
+        //        System.out.print(i + "\t" + filterTables.get(i).getVariables().toString() + filterTables.get(i).getTable().toString() + "\n");
+        //}
+        //System.out.println("\n------------------------------------------\n");
     }
 
     /**
@@ -153,8 +138,49 @@ public class Constraint {
      *
      * @return an array of cells, which are the variables for this constraint
      */
-    public Cell[] getVariables() {
-        return variables;
+    public Cell[] getVariables() { return variables; }
+
+    /**
+     * Sorts the variables list by depth assigned (increasing depth order)
+     *
+     * @return an array of cells, which are the variables for this constraint
+     */
+    private void sortVariablesByDepth() {
+        ArrayList<Cell> variables = new ArrayList<Cell>();
+
+        // construct hashtable to map variable index to variable depth
+        Hashtable<Integer, Integer> indexByDepth = new Hashtable<Integer, Integer>();
+        for(int i = 0; i < this.variables.length; i++) {
+            indexByDepth.put(i, this.variables[i].getDepthAssigned());
+        }
+
+        // sort variables by depth
+        for(int i = 0; i < this.variables.length; i++) {
+            for(int j = 0; j < this.variables.length; j++) {
+                // compare each variable depth with all other variable depths (except self)
+                if ((i != j) && (indexByDepth.get(i) < indexByDepth.get(j))) {
+                    // if the variables array list doesn't already contain the variable add it
+                    if(!variables.contains(this.variables[i])) {
+                        variables.add(this.variables[i]);
+                        break;  // break loop, as no more comparisons w/ this current iteration of j are necessary
+                    }
+                }
+            }
+        }
+
+        // add last (ie greatest depth) variable to variables list (as this doesn't get added in above sort)
+        for(Cell variable : this.variables) {
+            if(!variables.contains(variable)) {
+                // Whichever variable in this.variables that is not already in variables list
+                // is the variable w/ greatest depth of assignment, add to list as it wasn't added in sort above
+                variables.add(variable);
+            }
+        }
+
+        // construct sorted-by-depth variable array from arraylist
+        for(int i = 0; i < this.variables.length; i++) {
+            this.variables[i] = variables.get(i);
+        }
     }
 
     /**

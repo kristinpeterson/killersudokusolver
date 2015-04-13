@@ -18,6 +18,8 @@ import java.util.*;
  */
 public class Util {
 
+    static final Integer MAX_DEPTH = 80;
+
     /**
      * Prints the necessary output for Milestone 1:
      *
@@ -110,28 +112,35 @@ public class Util {
     public static ConflictSet extendAssignment(Generator[] generators, Integer step_count, Integer curr_depth) {
         Generator g = generators[curr_depth];   // g is the Generator for the current depth
         g.setAssignCount(0); // g has yet to assign its variable to any of the domain values
-        ConflictSet cs = new ConflictSet();
-        while(assign_variable(g, step_count, curr_depth) == true){
-            if(curr_depth == Main.MAX_DEPTH){
+        ConflictSet cs = g.getVariable().getValue().getConflictSet();   // TODO: lame attempt at retaining cs during recurrence
+        while(assign_variable(g, step_count, curr_depth)){
+            if(curr_depth.equals(MAX_DEPTH)){
                 recordSolution(generators);
-                return new ConflictSet();
+                return null;
             } else {
                 //pass control down to the next generator
                 cs = extendAssignment(generators, step_count, curr_depth + 1);
-                if(cs.isEmpty())
-                    return cs;
-                if(!cs.contains(g.getVariable())){ //conflict set *does not* contains the Cell  //BACKJUMP?
-                    System.out.println("DO I EVER SET A hypothesis????? ");
-                    g.setWorkingHypothesis(g.getVariable().getValue());
-                    return cs;
-                } else {
-                    cs.remove(g.getVariable());
-                    cs.setStepAssigned(step_count);
-                    g.getVariable().getValue().setConflictSet(cs);
-                }
             }
+
+            if(cs.isEmpty()) {  // TODO: figure out why this is always empty
+                System.out.println("cs.isEmpty()");
+                return cs;
+            }
+            if(!cs.contains(g.getVariable())){ //conflict set *does not* contains the Cell - BACKJUMP
+                System.out.println("!cs.contains(g.getVariable() - set working hypothesis");
+                g.setWorkingHypothesis(g.getVariable().getValue()); // TODO: this is never called because cs.isEmpty is always true
+                return cs;
+            }
+
+            System.out.println("cs.contains(g.getVariable()");  // TODO: this part is never reached
+            cs.remove(g.getVariable());
+            cs.setStepAssigned(step_count);
+            g.getVariable().getValue().setConflictSet(cs);
         }
+
+        System.out.println("End of extendAssignment() cs is " + cs.getVariables().toString());
         //return the union of the conflict sets associated with each domain value of the cell
+        // TODO: it appears that this cs is always empty, we need to figure out how to actually return the cs
         return cs;
     }
 
@@ -142,10 +151,9 @@ public class Util {
 
         while(!(dv = select_next_assignment(g)).equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
             step_count++;
-            cs = filterCurrentAssignment(g.getFilters(), curr_depth, dv);
+            cs = filterCurrentAssignment(g, curr_depth, dv);
             dv.setConflictSet(cs);
             if(cs.isEmpty()){
-                g.setWorkingHypothesis(dv); //TODO set a working hypothesis somewhere
                 return true;
             } else {
                 cs.setStepAssigned(step_count);
@@ -154,38 +162,38 @@ public class Util {
         return false; //all domain values tried and nothing consistent found
     }
 
-    private static ConflictSet filterCurrentAssignment(ArrayList<Constraint> filters, Integer curr_depth,
+    private static ConflictSet filterCurrentAssignment(Generator g, Integer curr_depth,
                                                       DomainValue currentAssignment){
         ConflictSet cs = new ConflictSet();
 
-        for(Constraint c: filters) {
+        // Iterate over filters to build the ConflictSet for the given assignment (which can be empty)
+        for(Constraint c: g.getFilters()) {
             FilterTable ft;
-            ArrayList<Integer> gen_depths = new ArrayList<Integer>(); //keep track of related variables depths
             ft = c.getFilterTableByDepth(curr_depth);
             StringBuilder key = new StringBuilder();
 
-            for (Cell v: c.getVariables()) { //find the depths of all related variables
-                String depth_key = ""+ v.getX()+ v.getY();
-                if(!gen_depths.contains(Main.generator_map.get(depth_key)))
-                    gen_depths.add(Main.generator_map.get(depth_key));
-            }
-
-            Collections.sort(gen_depths);
-            
-            for(int i: gen_depths){
-                DomainValue hypothesis = Main.generators[i].getWorkingHypothesis();
-                if(i < curr_depth && hypothesis != null){
+            // if depth of generator (variable) is less than curr_depth, add working hypothesis to key list
+            for(Cell variable : c.getVariables()){
+                int depthAssigned = variable.getDepthAssigned();
+                DomainValue hypothesis = Main.generators[depthAssigned].getWorkingHypothesis();
+                if((depthAssigned < curr_depth) && (hypothesis != null)){
                     key.append(hypothesis.getDomainValue()); //append working hypothesis of generators above to key
                 }
             }
+
             key.append(currentAssignment.getDomainValue());
+
+            // if the filter table doesn't contain the key, add the variables associated w/ that filter table to the conflict set
             if (!ft.getTable().containsKey(key.toString())) {
+                // Construct conflict set from ft.getVariables()
+                // Note: Do not add the current variable to the conflict set (ie self)
+                ArrayList<Cell> conflictingVariables = ft.getVariables();
+                conflictingVariables.remove(g.getVariable());
                 cs.addVariables(ft.getVariables()); //Add all variables that might conflict to the conflict set
-            } else {
-                return cs;
             }
         }
-        return cs; 
+
+        return cs; // cs will be empty if no conflicts identified
     }
 
     private static boolean hasRecentlyReassignedVariable(ConflictSet cs){
@@ -220,11 +228,13 @@ public class Util {
         }
 
         // Choose a random DomainValue from the dvCandidates list
-        Random rng = new Random(new Date().getTime());
-        int randomIndex = rng.nextInt(dvCandidates.size());
-        dv = dvCandidates.get(randomIndex);
-        g.getVariable().setValue(dv);
-        g.setWorkingHypothesis(dv); //TODO set hypothesis somewhere
+        if(dvCandidates.size() > 0) {   // added this condition, because if dvCandidates <= 0, this throws an error
+            Random rng = new Random(new Date().getTime());
+            int randomIndex = rng.nextInt(dvCandidates.size());
+            dv = dvCandidates.get(randomIndex);
+            g.getVariable().setValue(dv);
+            g.setWorkingHypothesis(dv); //TODO set hypothesis somewhere PROBABLY NOT HERE
+        }
         return dv;
     }
 

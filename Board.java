@@ -103,8 +103,9 @@ public class Board {
         orderedCells.addAll(nine);
 
         cells.clear();
-        for(Cell cell: orderedCells) {
-            cells.add(cell);
+        for(int i = 0; i < orderedCells.size(); i++) {
+            orderedCells.get(i).setDepthAssigned(i);
+            cells.add(orderedCells.get(i));
         }
         orderedCells.clear();
     }
