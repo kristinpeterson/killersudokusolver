@@ -112,8 +112,8 @@ public class Util {
     public static ConflictSet extendAssignment(Generator[] generators, Integer step_count, Integer curr_depth) {
         Generator g = generators[curr_depth];   // g is the Generator for the current depth
         g.setAssignCount(0); // g has yet to assign its variable to any of the domain values
-        ConflictSet cs;   // TODO: lame attempt at retaining cs during recurrence
-        while((cs = assign_variable(g, step_count, curr_depth)).equals(new ConflictSet())){
+        ConflictSet cs = g.getVariable().getValue().getConflictSet();   // TODO: lame attempt at retaining cs during recurrence
+        while(assign_variable(g, step_count, curr_depth)){
             if(curr_depth.equals(MAX_DEPTH)){
                 recordSolution(generators);
                 return null;
@@ -132,42 +132,38 @@ public class Util {
                 return cs;
             }
 
-            //System.out.println("cs.contains(g.getVariable() " + g.getVariable());  // TODO: this part is never reached
+            System.out.println("cs.contains(g.getVariable()");  // TODO: this part is never reached
             cs.remove(g.getVariable());
             cs.setStepAssigned(step_count);
             g.getVariable().getValue().setConflictSet(cs);
         }
 
-        //System.out.println("End of extendAssignment() cs is " + cs.getVariables().toString());
+        System.out.println("End of extendAssignment() cs is " + cs.getVariables().toString());
         //return the union of the conflict sets associated with each domain value of the cell
         // TODO: it appears that this cs is always empty, we need to figure out how to actually return the cs
         return cs;
     }
 
     //return true if a value can be assigned to generator
-    private static ConflictSet assign_variable(Generator g, Integer step_count, Integer curr_depth){
+    private static boolean assign_variable(Generator g, Integer step_count, Integer curr_depth){
         DomainValue dv;
-        ConflictSet cs = new ConflictSet();
-        if(step_count > 1000000) {
-            return cs;
-        }
+        ConflictSet cs;
+
         while(!(dv = select_next_assignment(g)).equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
             step_count++;
             cs = filterCurrentAssignment(g, curr_depth, dv);
-            //System.out.println(g.getVariable().getDepthAssigned() + " g.var " + g.getVariable() + " - " + cs.getVariables());
             dv.setConflictSet(cs);
-            if(cs.isEmpty()) {
-                g.setWorkingHypothesis(dv);
-                return cs;
+            if(cs.isEmpty()){
+                return true;
             } else {
                 cs.setStepAssigned(step_count);
             }
         }
-        return cs; //all domain values tried and nothing consistent found
+        return false; //all domain values tried and nothing consistent found
     }
 
     private static ConflictSet filterCurrentAssignment(Generator g, Integer curr_depth,
-                                                      DomainValue currentAssignment){
+                                                       DomainValue currentAssignment){
         ConflictSet cs = new ConflictSet();
 
         // Iterate over filters to build the ConflictSet for the given assignment (which can be empty)
@@ -314,7 +310,7 @@ public class Util {
                     }
                 }
             }
-        }    
+        }
         return true;
     }
 
