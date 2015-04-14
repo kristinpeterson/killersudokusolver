@@ -75,7 +75,7 @@ public class Constraint {
             // add satisfying assignments for the vars to the filter table's hashtable
             for(ArrayList<Integer> satisfyingAssignment : satisfyingAssignments) {
                 StringBuilder sb = new StringBuilder();
-                for(int j = 0; j <= i; j++) {
+                for(int j = 0; j < i; j++) {
                     sb.append(satisfyingAssignment.get(j));
                 }
                 if(!ft.getTable().containsKey(sb.toString())) {
@@ -147,6 +147,11 @@ public class Constraint {
      */
     private void sortVariablesByDepth() {
         ArrayList<Cell> variables = new ArrayList<Cell>();
+        ArrayList<ArrayList<Integer>> satisfyingAssignments = new ArrayList<ArrayList<Integer>>();
+
+        for(int i = 0; i < this.satisfyingAssignments.size(); i++) {
+            satisfyingAssignments.add(new ArrayList<Integer>());
+        }
 
         // construct hashtable to map variable index to variable depth
         Hashtable<Integer, Integer> indexByDepth = new Hashtable<Integer, Integer>();
@@ -161,6 +166,10 @@ public class Constraint {
                 if ((i != j) && (indexByDepth.get(i) < indexByDepth.get(j))) {
                     // if the variables array list doesn't already contain the variable add it
                     if(!variables.contains(this.variables[i])) {
+                        // construct satisfying assignments
+                        for(int k = 0; k < this.satisfyingAssignments.size(); k++){
+                            satisfyingAssignments.get(k).add(this.satisfyingAssignments.get(k).get(i));
+                        }
                         variables.add(this.variables[i]);
                         break;  // break loop, as no more comparisons w/ this current iteration of j are necessary
                     }
@@ -169,11 +178,15 @@ public class Constraint {
         }
 
         // add last (ie greatest depth) variable to variables list (as this doesn't get added in above sort)
-        for(Cell variable : this.variables) {
-            if(!variables.contains(variable)) {
+        for(int i = 0; i < this.variables.length; i++) {
+            if(!variables.contains(this.variables[i])) {
+                // construct satisfying assignments
+                for(int k = 0; k < this.satisfyingAssignments.size(); k++){
+                    satisfyingAssignments.get(k).add(this.satisfyingAssignments.get(k).get(i));
+                }
                 // Whichever variable in this.variables that is not already in variables list
                 // is the variable w/ greatest depth of assignment, add to list as it wasn't added in sort above
-                variables.add(variable);
+                variables.add(this.variables[i]);
             }
         }
 
@@ -181,6 +194,9 @@ public class Constraint {
         for(int i = 0; i < this.variables.length; i++) {
             this.variables[i] = variables.get(i);
         }
+
+        // assign satisfying assignments to this object
+        this.satisfyingAssignments = satisfyingAssignments;
     }
 
     /**
