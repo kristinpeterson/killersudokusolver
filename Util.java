@@ -3,7 +3,6 @@ package killersudokusolver;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -112,7 +111,7 @@ public class Util {
     public static ConflictSet extendAssignment(Generator[] generators, Integer step_count, Integer curr_depth) {
         Generator g = generators[curr_depth];   // g is the Generator for the current depth
         g.setAssignCount(0); // g has yet to assign its variable to any of the domain values
-        ConflictSet cs = g.getVariable().getValue().getConflictSet();   // TODO: lame attempt at retaining cs during recurrence
+        ConflictSet cs = new ConflictSet();
         while(assign_variable(g, step_count, curr_depth)){
             if(curr_depth.equals(MAX_DEPTH)){
                 recordSolution(generators);
@@ -122,17 +121,18 @@ public class Util {
                 cs = extendAssignment(generators, step_count, curr_depth + 1);
             }
 
-            if(cs.isEmpty()) {  // TODO: figure out why this is always empty
-                System.out.println("cs.isEmpty()");
+            if(cs.isEmpty()) {
+                System.out.println("cs.isEmpty(): " + cs.getVariables().toString());
                 return cs;
             }
+            System.out.println("before !cs.contains: " + cs.getVariables().toString());
             if(!cs.contains(g.getVariable())){ //conflict set *does not* contains the Cell - BACKJUMP
-                System.out.println("!cs.contains(g.getVariable() - set working hypothesis");
-                g.setWorkingHypothesis(g.getVariable().getValue()); // TODO: this is never called because cs.isEmpty is always true
+                System.out.println("BACKJUMP! !cs.contains(g.getVariable() - set working hypothesis:" + cs.getVariables().toString());
+                g.setWorkingHypothesis(g.getVariable().getValue());
                 return cs;
             }
 
-            System.out.println("cs.contains(g.getVariable()");  // TODO: this part is never reached
+            System.out.println("cs.contains(g.getVariable()): cs.getvar = " + cs.getVariables().toString() + " g.var = " + g.getVariable());
             cs.remove(g.getVariable());
             cs.setStepAssigned(step_count);
             g.getVariable().getValue().setConflictSet(cs);
@@ -140,7 +140,6 @@ public class Util {
 
         System.out.println("End of extendAssignment() cs is " + cs.getVariables().toString());
         //return the union of the conflict sets associated with each domain value of the cell
-        // TODO: it appears that this cs is always empty, we need to figure out how to actually return the cs
         return cs;
     }
 
@@ -153,7 +152,11 @@ public class Util {
             step_count++;
             cs = filterCurrentAssignment(g, curr_depth, dv);
             dv.setConflictSet(cs);
+
+            System.out.println("dv: " + dv.getDomainValue().toString());
+            System.out.println(g.getVariable().getDepthAssigned() + " g.var " + g.getVariable() + " - " + cs.getVariables());
             if(cs.isEmpty()){
+                g.setWorkingHypothesis(dv);
                 return true;
             } else {
                 cs.setStepAssigned(step_count);
@@ -189,7 +192,7 @@ public class Util {
                 // Note: Do not add the current variable to the conflict set (ie self)
                 ArrayList<Cell> conflictingVariables = ft.getVariables();
                 conflictingVariables.remove(g.getVariable());
-                cs.addVariables(ft.getVariables()); //Add all variables that might conflict to the conflict set
+                cs.addVariables(conflictingVariables); //Add all variables that might conflict to the conflict set
             }
         }
 
@@ -233,7 +236,7 @@ public class Util {
             int randomIndex = rng.nextInt(dvCandidates.size());
             dv = dvCandidates.get(randomIndex);
             g.getVariable().setValue(dv);
-            g.setWorkingHypothesis(dv); //TODO set hypothesis somewhere PROBABLY NOT HERE
+            g.setWorkingHypothesis(dv);
         }
         return dv;
     }
@@ -346,7 +349,7 @@ public class Util {
         }
     }
 
-    private static void printSolutionBoard(Generator[] generators) {
+    public static void printSolutionBoard(Generator[] generators) {
         int[][] solution = new int[9][9];
         for(Generator g : generators) {
             Cell cell = g.getVariable();

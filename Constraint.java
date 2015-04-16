@@ -75,7 +75,7 @@ public class Constraint {
             // add satisfying assignments for the vars to the filter table's hashtable
             for(ArrayList<Integer> satisfyingAssignment : satisfyingAssignments) {
                 StringBuilder sb = new StringBuilder();
-                for(int j = 0; j < i; j++) {
+                for(int j = 0; j <= i; j++) {
                     sb.append(satisfyingAssignment.get(j));
                 }
                 if(!ft.getTable().containsKey(sb.toString())) {

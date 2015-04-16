@@ -78,6 +78,7 @@ public class Main {
 			c.constructFilterTables();
 		}
 		Util.extendAssignment(generators, 1, 0);
+		Util.printSolutionBoard(generators);
 	}
 
 	/**
