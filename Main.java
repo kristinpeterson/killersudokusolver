@@ -87,7 +87,7 @@ public class Main {
 	 */
 	private static void getCagesFromFile() throws Exception {
 		try {
-			File f = new File("testcase2.txt");
+			File f = new File("testcase.txt");
 			FileReader fr = new FileReader(f);
 			BufferedReader br = new BufferedReader(fr);
 			String eachLine = br.readLine();

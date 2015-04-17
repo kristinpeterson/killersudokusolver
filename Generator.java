@@ -18,6 +18,8 @@ public class Generator{
 	private Cell variable;
 	private DomainValue workingHypothesis;
 	private Integer assignCount;	//counts the number of assignments that the generator has made to its variable
+	private int count;
+	private ConflictSet unionCS;
 
 	/**
 	 * Constructor for the generator, sets the variable
@@ -36,6 +38,28 @@ public class Generator{
             }
         }
         setAssignCount(0);
+        count = 0;
+        unionCS = new ConflictSet();
+	}
+
+	public int getIndexCount(){
+		return count;
+	}
+
+	public void incrementIndexCount(){
+		count++;
+	}
+
+	public void resetIndexCount(){
+		count = 0;
+	}
+
+	public void setUnionConflictSet(ConflictSet cs){
+		unionCS = cs;
+	}
+
+	public ConflictSet getUnionConflictSet(){
+		return unionCS;
 	}
 
 	/**

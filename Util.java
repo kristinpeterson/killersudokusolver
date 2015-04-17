@@ -145,19 +145,20 @@ public class Util {
             g.getVariable().getValue().setConflictSet(cs);
         }
 
-        System.out.println("End of extendAssignment() cs is " + cs.getVariables().toString());
+        g.resetIndexCount();
+        System.out.println("End of extendAssignment() cs is " + g.getUnionConflictSet());
         //return the union of the conflict sets associated with each domain value of the cell
-        return cs;
+        return g.getUnionConflictSet();
     }
 
     //return true if a value can be assigned to generator
     private static boolean assign_variable(Generator g, Integer step_count, Integer curr_depth){
         DomainValue dv;
-        ConflictSet cs;
-        int count = 0;
+        ConflictSet cs = new ConflictSet();
 
-        while(!(dv = select_next_assignment(g, count)).equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
+        while(!(dv = select_next_assignment(g, g.getIndexCount())).equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
             step_count++;
+            g.incrementIndexCount();
             cs = filterCurrentAssignment(g, curr_depth, dv);
             dv.setConflictSet(cs);
 
@@ -169,8 +170,8 @@ public class Util {
             } else {
                 cs.setStepAssigned(step_count);
             }
-            count++;
         }
+        g.setUnionConflictSet(cs);
         return false; //all domain values tried and nothing consistent found
     }
 
