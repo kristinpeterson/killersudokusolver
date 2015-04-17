@@ -77,7 +77,9 @@ public class Main {
 		for(Constraint c: board.getConstraints()){
 			c.constructFilterTables();
 		}
-		Util.extendAssignment(generators, 1, 0);
+		ConflictSet cs = Util.extendAssignment(generators, 0);
+		while(!cs.isEmpty() && !generators[0].getWorkingHypothesis().equals(new DomainValue(0)))
+			cs = Util.extendAssignment(generators, 0);
 		Util.printSolutionBoard(generators);
 	}
 

@@ -31,10 +31,10 @@ public class Generator{
 		setVariable(variable);
 		filters = new ArrayList<Constraint>();
         for (Constraint c : Main.board.getConstraints()) {
-        	String x = ""+variable.getX();
-        	String y = ""+variable.getY();
-            if(c.getName().contains(x+y) | c.getName().contains(x+"."+y)){ 
-                filters.add(c);
+        	for(Cell cell : c.getVariables()) {
+                if(variable.equals(cell)) {
+                    filters.add(c);
+                }
             }
         }
         setAssignCount(0);
@@ -48,6 +48,8 @@ public class Generator{
 
 	public void incrementIndexCount(){
 		count++;
+		if(count >= variable.getDomain().getDomainValues().size())
+			resetIndexCount();
 	}
 
 	public void resetIndexCount(){
