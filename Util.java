@@ -124,17 +124,17 @@ public class Util {
             }
 
             if(cs.isEmpty()) {
-                System.out.println("Empty conflict set " + curr_depth);
+                //System.out.println("Empty conflict set " + curr_depth);
                 return extendAssignment(generators, curr_depth + 1); //keep recursing since there are no issues
             }
-            System.out.println("before !cs.contains: " + cs.getVariables().toString());
+            //System.out.println("before !cs.contains: " + cs.getVariables().toString());
             if(!cs.contains(g.getVariable())){ //conflict set *does not* contains the Cell - BACKJUMP
-                System.out.println("BACKJUMP! !cs.contains(g.getVariable() - set working hypothesis:" + cs.getVariables().toString());
+                //System.out.println("BACKJUMP! !cs.contains(g.getVariable() - set working hypothesis:" + cs.getVariables().toString());
                 g.setWorkingHypothesis(g.getVariable().getValue());
                 return cs;
             }
             if(cs.getVariables().size() == 1){  //Conflict set ONLY has the current variable
-                System.out.println("BACKJUMP! cs SIZE 1 - set working hypothesis:" + cs.getVariables().toString());
+                //System.out.println("BACKJUMP! cs SIZE 1 - set working hypothesis:" + cs.getVariables().toString());
                 g.setWorkingHypothesis(g.getVariable().getValue());
                 cs.remove(g.getVariable());
                 if(curr_depth == 0)
@@ -143,14 +143,17 @@ public class Util {
                     return cs;
             }
 
-            System.out.println("cs.contains(g.getVariable()): cs.getvar = " + cs.getVariables().toString() + " g.var = " + g.getVariable());
+            //System.out.println("cs.contains(g.getVariable()): cs.getvar = " + cs.getVariables().toString() + " g.var = " + g.getVariable());
+            System.out.println("\n---REMOVING FROM CONFLICT SET---");
+            System.out.println(g.getVariable());
+            System.out.println("--------------------------------");
             cs.remove(g.getVariable());
             cs.setStepAssigned(step_count);
             g.getVariable().getValue().setConflictSet(cs);
             g.setUnionConflictSet(cs); //DO we need this????
         }
 
-        System.out.println("End of extendAssignment() cs is " + g.getUnionConflictSet());
+        //System.out.println("End of extendAssignment() cs is " + g.getUnionConflictSet());
         //return the union of the conflict sets associated with each domain value of the cell
         return g.getUnionConflictSet();
     }
@@ -167,9 +170,12 @@ public class Util {
             cs = filterCurrentAssignment(g, curr_depth, dv);
             dv.setConflictSet(cs);
 
-            System.out.println("dv: " + dv.getDomainValue().toString());
-            System.out.println(g.getVariable().getDepthAssigned() + " g.var " + g.getVariable() + " - " + cs.getVariables());
+            //System.out.println("dv: " + dv.getDomainValue().toString());
+            //System.out.println(g.getVariable().getDepthAssigned() + " g.var " + g.getVariable() + " - " + cs.getVariables());
             if(cs.isEmpty()){
+                System.out.println("\n-------VALID ASSIGNMENT---------");
+                System.out.println("Depth: " + curr_depth + " Generator: " + g.getVariable() + " Value: " + dv.getDomainValue().toString());
+                System.out.println("--------------------------------");
                 g.setWorkingHypothesis(dv);
                 return true;
             } else {
@@ -179,6 +185,9 @@ public class Util {
         }
         union.setStepAssigned(step_count);
         g.setUnionConflictSet(union);
+        System.out.println("\n-----------FAILURE------------");
+        System.out.println("All domain values tried, nothing consistent found. \nConflict set: " + g.getUnionConflictSet());
+        System.out.println("--------------------------------");
         return false; //all domain values tried and nothing consistent found
     }
 
