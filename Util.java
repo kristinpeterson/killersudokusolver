@@ -19,6 +19,7 @@ public class Util {
 
     static final Integer MAX_DEPTH = 80;
     static int step_count = 1;
+    static ConflictSet unionCS = new ConflictSet();
 
     /**
      * Prints the necessary output for Milestone 1:
@@ -112,82 +113,78 @@ public class Util {
     public static ConflictSet extendAssignment(Generator[] generators, Integer curr_depth) {
         Generator g = generators[curr_depth];   // g is the Generator for the current depth
         g.setAssignCount(0); // g has yet to assign its variable to any of the domain values
-        ConflictSet cs = new ConflictSet();
+        ConflictSet cs;
         while(assign_variable(g, curr_depth)){
             if(curr_depth.equals(MAX_DEPTH)){
                 recordSolution(generators);
                 return null;
             } else {
                 //pass control down to the next generator
-                ConflictSet cs2 = extendAssignment(generators, curr_depth + 1);
-                cs.addVariables(cs2.getVariables()); // Add the recursed accumulated conflict set to the existing one
+                cs = extendAssignment(generators, curr_depth + 1);
             }
 
             if(cs.isEmpty()) {
                 //System.out.println("Empty conflict set " + curr_depth);
-                return extendAssignment(generators, curr_depth + 1); //keep recursing since there are no issues
+                return cs;
             }
-            //System.out.println("before !cs.contains: " + cs.getVariables().toString());
+
             if(!cs.contains(g.getVariable())){ //conflict set *does not* contains the Cell - BACKJUMP
-                //System.out.println("BACKJUMP! !cs.contains(g.getVariable() - set working hypothesis:" + cs.getVariables().toString());
+                System.out.println("\nBACKJUMP - current depth: " + curr_depth);
                 g.setWorkingHypothesis(g.getVariable().getValue());
                 return cs;
             }
-            if(cs.getVariables().size() == 1){  //Conflict set ONLY has the current variable
-                //System.out.println("BACKJUMP! cs SIZE 1 - set working hypothesis:" + cs.getVariables().toString());
-                g.setWorkingHypothesis(g.getVariable().getValue());
-                cs.remove(g.getVariable());
-                if(curr_depth == 0)
-                    return extendAssignment(generators, curr_depth + 1);
-                else
-                    return cs;
-            }
 
-            //System.out.println("cs.contains(g.getVariable()): cs.getvar = " + cs.getVariables().toString() + " g.var = " + g.getVariable());
             System.out.println("\n---REMOVING FROM CONFLICT SET---");
             System.out.println(g.getVariable());
             System.out.println("--------------------------------");
             cs.remove(g.getVariable());
             cs.setStepAssigned(step_count);
             g.getVariable().getValue().setConflictSet(cs);
-            g.setUnionConflictSet(cs); //DO we need this????
         }
 
-        //System.out.println("End of extendAssignment() cs is " + g.getUnionConflictSet());
+
+        System.out.println("\n------------CSUNION-------------");
+        System.out.println("curr_depth: " + curr_depth);
+        System.out.println(getUnionConflictSet().toString());
+        System.out.println("--------------------------------");
         //return the union of the conflict sets associated with each domain value of the cell
-        return g.getUnionConflictSet();
+        return getUnionConflictSet();
     }
 
     //return true if a value can be assigned to generator
     private static boolean assign_variable(Generator g, Integer curr_depth){
         DomainValue dv;
-        ConflictSet cs = new ConflictSet();
+        ConflictSet cs;
         ConflictSet union = new ConflictSet();
 
-        while(!(dv = select_next_assignment(g, g.getIndexCount())).equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
+        while(!(dv = select_next_assignment(g)).equals(new DomainValue(0))){ // a 0 domain value is the marker for no more values
             step_count++;
             g.incrementIndexCount();
+            System.out.println("\nDepth: " + g.getVariable().getDepthAssigned() + " g.var " + g.getVariable()
+                    + " dv: " + dv.getDomainValue().toString());
             cs = filterCurrentAssignment(g, curr_depth, dv);
-            dv.setConflictSet(cs);
 
-            //System.out.println("dv: " + dv.getDomainValue().toString());
-            //System.out.println(g.getVariable().getDepthAssigned() + " g.var " + g.getVariable() + " - " + cs.getVariables());
-            if(cs.isEmpty()){
+             if(cs.isEmpty()){
                 System.out.println("\n-------VALID ASSIGNMENT---------");
                 System.out.println("Depth: " + curr_depth + " Generator: " + g.getVariable() + " Value: " + dv.getDomainValue().toString());
                 System.out.println("--------------------------------");
                 g.setWorkingHypothesis(dv);
+                setUnionConflictSet(new ConflictSet());
                 return true;
             } else {
                 cs.setStepAssigned(step_count);
+                dv.setConflictSet(cs);
+                // Assign the conflict set to the domain value inside the generators assigned variable domainset
+                int genDVIndex = g.getVariable().getDomain().getDomainValues().indexOf(dv);
+                g.getVariable().getDomain().getDomainValues().get(genDVIndex).setConflictSet(cs);
                 union.addVariables(cs.getVariables());
             }
         }
         union.setStepAssigned(step_count);
-        g.setUnionConflictSet(union);
-        System.out.println("\n-----------FAILURE------------");
-        System.out.println("All domain values tried, nothing consistent found. \nConflict set: " + g.getUnionConflictSet());
-        System.out.println("--------------------------------");
+        setUnionConflictSet(union);
+        //System.out.println("\n-----------FAILURE------------");
+        //System.out.println("All domain values tried, nothing consistent found. \nConflict set union: " + getUnionConflictSet());
+        //System.out.println("--------------------------------");
         return false; //all domain values tried and nothing consistent found
     }
 
@@ -217,6 +214,7 @@ public class Util {
                 // Construct conflict set from ft.getVariables()
                 // Note: Do not add the current variable to the conflict set (ie self)
                 ArrayList<Cell> conflictingVariables = ft.getVariables();
+                System.out.println("\nConstraint Violated: " + c.toString() + "\n-\nAdding conflicting variables to cs: " + conflictingVariables.toString());
                 conflictingVariables.remove(g.getVariable());
                 cs.addVariables(conflictingVariables); //Add all variables that might conflict to the conflict set
             }
@@ -237,7 +235,7 @@ public class Util {
         return false;
     }
 
-    private static DomainValue select_next_assignment(Generator g, int count){
+    private static DomainValue select_next_assignment(Generator g){
         Cell variable = g.getVariable();
         if (g.getAssignCount() == variable.getDomain().getDomainValues().size())
             return new DomainValue(0);
@@ -245,13 +243,9 @@ public class Util {
         g.incrementAssignCount();
         DomainValue dv = g.getWorkingHypothesis();
 
-        if( dv != null && !dv.equals(new DomainValue(0)) && hasRecentlyReassignedVariable(dv.getConflictSet()))
+        if(dv != null && !dv.equals(new DomainValue(0)) && hasRecentlyReassignedVariable(dv.getConflictSet()))
             return dv;
 
-        ArrayList<DomainValue> dvCandidates = g.getVariable().getDomain().getDomainValues();
-        if(count<dvCandidates.size())
-            return dvCandidates.get(count);
-        /*
         // Create list of DomainValue candidates that have been recently assigned
         ArrayList<DomainValue> dvCandidates = new ArrayList<DomainValue>();
         for(DomainValue dvCandidate : g.getVariable().getDomain().getDomainValues()) {
@@ -267,7 +261,7 @@ public class Util {
             dv = dvCandidates.get(randomIndex);
             g.getVariable().setValue(dv);
             g.setWorkingHypothesis(dv);
-        }*/
+        }
         return dv;
     }
 
@@ -371,6 +365,14 @@ public class Util {
         nonessential.put(ne, temp);
     }
 
+    private static void setUnionConflictSet(ConflictSet cs){
+        unionCS = cs;
+    }
+
+    private static ConflictSet getUnionConflictSet(){
+        return unionCS;
+    }
+
     private static void recordSolution(Generator[] generators) {
         System.out.println("SOLUTION FOUND!");
         printSolutionBoard(generators);
@@ -415,7 +417,7 @@ public class Util {
 
         for(Generator g: generators){
             if(g.getWorkingHypothesis() != null)
-                System.out.println(g.getVariable() + " - "+g.getWorkingHypothesis());
+                System.out.println(g.getVariable() + " - " + g.getWorkingHypothesis());
         }
 
         System.out.println("Step count "+ step_count);

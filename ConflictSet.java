@@ -106,7 +106,7 @@ public class ConflictSet {
     public String toString() {
         StringBuilder sb = new StringBuilder("Step Assigned: "+stepAssigned+"\n");
         for (int i=0; i<variables.size(); i++) {
-            sb.append("Variable "+i+variables.get(i)+"\n");
+            sb.append(variables.get(i) + "\n");
         }
         return sb.toString();
     }
